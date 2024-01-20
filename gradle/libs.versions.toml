@@ -1,0 +1,20 @@
+[versions]
+plugin-android = "7.3.1"
+plugin-kotlin = "1.9.10"
+
+kotlinx-html = "0.9.1"
+kotlinx-coroutines = "1.7.3"
+
+littlekt = "0.8.0"
+
+[libraries]
+plugin-android = { module = "com.android.tools.build:gradle", version.ref = "plugin-android" }
+plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "plugin-kotlin" }
+
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-html-js = { module = "org.jetbrains.kotlinx:kotlinx-html-js", version.ref = "kotlinx-html" }
+
+littlekt-core = { module = "com.lehaine.littlekt:core", version.ref = "littlekt" }
+
+[bundles]
+plugins = ["plugin-android", "plugin-kotlin"]

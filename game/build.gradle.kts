@@ -17,11 +17,12 @@ kotlin {
         compilations {
             val main by getting
 
-            val mainClass = (findProperty("jvm.mainClass") as? String)?.plus("Kt")
-                ?: project.logger.log(
-                    LogLevel.ERROR,
-                    "Property 'jvm.mainClass' has either changed or has not been set. Check 'gradle.properties' and ensure it is properly set!"
-                )
+            val mainClass =
+                (findProperty("jvm.mainClass") as? String)?.plus("Kt")
+                    ?: project.logger.log(
+                        LogLevel.ERROR,
+                        "Property 'jvm.mainClass' has either changed or has not been set. Check 'gradle.properties' and ensure it is properly set!",
+                    )
             tasks {
                 register<Copy>("copyResources") {
                     group = "package"
@@ -41,7 +42,7 @@ kotlin {
                     destinationDirectory.set(File("$buildDir/publish/"))
                     from(
                         main.runtimeDependencyFiles.map { if (it.isDirectory) it else zipTree(it) },
-                        main.output.classesDirs
+                        main.output.classesDirs,
                     )
                     doLast {
                         project.logger.lifecycle("[LittleKt] The packaged jar is available at: ${outputs.files.first().parent}")
@@ -50,7 +51,7 @@ kotlin {
             }
         }
         compilations.all {
-            kotlinOptions.jvmTarget = "11"
+            kotlinOptions.jvmTarget = "17"
         }
         testRuns["test"].executionTask.configure {
             useJUnit()
@@ -68,7 +69,7 @@ kotlin {
 
         this.attributes.attribute(
             KotlinPlatformType.attribute,
-            KotlinPlatformType.js
+            KotlinPlatformType.js,
         )
 
         compilations.all {
@@ -112,8 +113,8 @@ android {
         targetSdk = (findProperty("android.targetSdk") as String).toInt()
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

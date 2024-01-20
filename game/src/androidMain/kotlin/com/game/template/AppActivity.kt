@@ -7,7 +7,6 @@ import com.lehaine.littlekt.LittleKtProps
 import com.lehaine.littlekt.graphics.Color
 
 class AppActivity : LittleKtActivity() {
-
     override fun LittleKtProps.configureLittleKt() {
         activity = this@AppActivity
         backgroundColor = Color.DARK_GRAY

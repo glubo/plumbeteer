@@ -29,9 +29,9 @@ buildTgz:
   only:
     - tags
   stage: build
-  script: >
-    ./gradlew jsBrowserDistribution
-    tar -czf plumbeteer.tgz -C game/build/dist/js/productionExecutable/ .
+  script:
+    - ./gradlew jsBrowserDistribution
+    - tar -czf plumbeteer.tgz -C game/build/dist/js/productionExecutable/ .
   artifacts:
     paths:
       - plumbeteer.tgz
@@ -39,6 +39,8 @@ buildTgz:
 buildDocker:
   only:
     - tags
+  dependencies:
+    - buildTgz
   stage: build
   variables:
     STORAGE_DRIVER: vfs

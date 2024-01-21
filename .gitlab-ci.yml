@@ -44,7 +44,8 @@ buildDocker:
     STORAGE_DRIVER: vfs
     BUILDAH_FORMAT: docker
     BUILDAH_ISOLATION: chroot
-  image: registry.gitlab.com/g3476/buildah
+  image: glubo/buildah
+
   script: >
     buildah login -u "$CI_REGISTRY_USER" --password $CI_REGISTRY_PASSWORD $CI_REGISTRY
     buildah images

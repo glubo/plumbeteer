@@ -33,7 +33,8 @@ buildTgz:
     ./gradlew jsBrowserDistribution
     tar -czf plumbeteer.tgz -C game/build/dist/js/productionExecutable/ .
   artifacts:
-    plumbeteer.tgz
+    paths:
+      - plumbeteer.tgz
 
 buildDocker:
   only:

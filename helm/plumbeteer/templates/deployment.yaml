@@ -42,10 +42,6 @@ spec:
             - name: {{ .name | quote }}
               value: {{ .value | quote }}
           {{- end }}
-          envFrom:
-            - secretRef:
-                name: plumbeteer
-                optional: false
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

@@ -7,6 +7,7 @@ WORKDIR /home/static
 
 # Copy the static website
 # Use the .dockerignore file to control what ends up inside the image!
+ADD health /home/static/
 ADD plumbeteer.tgz /home/static/
 
 EXPOSE 8080

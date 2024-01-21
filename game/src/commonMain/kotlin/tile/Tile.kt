@@ -19,6 +19,7 @@ sealed interface Tile {
 
     fun isEditable(): Boolean
 }
+
 sealed interface TileEvent
 
 data class Overflow(

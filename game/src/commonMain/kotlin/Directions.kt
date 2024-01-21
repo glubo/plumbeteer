@@ -59,4 +59,5 @@ enum class Orientation(
             }
     }
 }
+
 operator fun Vec2i.plus(vec2i: Vec2i) = Vec2i(this.x + vec2i.x, this.y + vec2i.y)

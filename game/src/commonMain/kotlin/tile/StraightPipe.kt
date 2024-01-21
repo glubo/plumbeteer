@@ -51,7 +51,6 @@ class StraightPipe(
                 elapsed += dt
             }
             when (liquidDirection) {
-
                 Direction.UP ->
                     shapeRenderer.filledRectangle(
                         target.x + target.width * 0.33333f,
@@ -102,7 +101,10 @@ class StraightPipe(
         return null
     }
 
-    override fun takeLiquid(direction: Direction, dt: Duration) = when {
+    override fun takeLiquid(
+        direction: Direction,
+        dt: Duration,
+    ) = when {
         liquidDirection != null -> false
         direction in orientation.directions -> {
             liquidDirection = direction

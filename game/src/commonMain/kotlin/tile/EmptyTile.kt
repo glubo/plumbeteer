@@ -21,6 +21,10 @@ data object EmptyTile : Tile {
         return null
     }
 
-    override fun takeLiquid(direction: Direction, dt: Duration) = false
+    override fun takeLiquid(
+        direction: Direction,
+        dt: Duration,
+    ) = false
+
     override fun isEditable() = true
 }

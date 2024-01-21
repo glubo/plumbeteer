@@ -17,7 +17,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class Game(context: Context) : ContextListener(context) {
-
     sealed interface FieldEvent
 
     class GameOver : FieldEvent
@@ -30,11 +29,12 @@ class Game(context: Context) : ContextListener(context) {
         val tileWidth = rect.width / xtiles
         val tileHeight = rect.height / ytiles
 
-        val tiles = (1..xtiles).map { _ ->
-            (1..ytiles).map { _ ->
-                EmptyTile
-            }.toMutableList<Tile>()
-        }
+        val tiles =
+            (1..xtiles).map { _ ->
+                (1..ytiles).map { _ ->
+                    EmptyTile
+                }.toMutableList<Tile>()
+            }
 
         fun onRender(
             shapeRenderer: ShapeRenderer,
@@ -45,11 +45,12 @@ class Game(context: Context) : ContextListener(context) {
                 slice.forEachIndexed { y, tile ->
                     val tileRect = getTileRect(x, y)
 
-                    val event = tile.onRender(
-                        tileRect,
-                        shapeRenderer,
-                        dt
-                    )
+                    val event =
+                        tile.onRender(
+                            tileRect,
+                            shapeRenderer,
+                            dt,
+                        )
 
                     when (event) {
                         is Overflow -> {
@@ -71,14 +72,18 @@ class Game(context: Context) : ContextListener(context) {
             return result
         }
 
-        private fun getTileOrNull(vec: Vec2i) = tiles.getOrNull(vec.x)
-            ?.getOrNull(vec.y)
+        private fun getTileOrNull(vec: Vec2i) =
+            tiles.getOrNull(vec.x)
+                ?.getOrNull(vec.y)
 
-        private fun getTileRect(x: Int, y: Int) = Rect(
+        private fun getTileRect(
+            x: Int,
+            y: Int,
+        ) = Rect(
             rect.x + x * tileWidth,
             rect.y + y * tileHeight,
             tileWidth * 0.95f,
-            tileHeight * 0.95f
+            tileHeight * 0.95f,
         )
 
         fun onTouchUp(pos: Vec2f) {
@@ -108,11 +113,12 @@ class Game(context: Context) : ContextListener(context) {
 
         var gameOver = false
 
-        val field = PlayField(
-            rect = Rect(-860 / 2f, -440 / 2f, 628f, 440f),
-            10,
-            7
-        )
+        val field =
+            PlayField(
+                rect = Rect(-860 / 2f, -440 / 2f, 628f, 440f),
+                10,
+                7,
+            )
 
         val processor =
             input.inputProcessor {
@@ -134,9 +140,11 @@ class Game(context: Context) : ContextListener(context) {
             startTimer = (startTimer - dt).coerceAtLeast(0.seconds)
 
             batch.use(camera.viewProjection) {
-                val event = field.onRender(
-                    shapeRenderer, dt
-                )
+                val event =
+                    field.onRender(
+                        shapeRenderer,
+                        dt,
+                    )
 
                 val timerLeft = startTimer / startDuration
                 shapeRenderer.filledRectangle(
@@ -145,8 +153,7 @@ class Game(context: Context) : ContextListener(context) {
                         -270f,
                         40f,
                         500f * timerLeft.toFloat(),
-                    )
-
+                    ),
                 )
 
                 when (event) {
@@ -165,5 +172,3 @@ class Game(context: Context) : ContextListener(context) {
         }
     }
 }
-
-

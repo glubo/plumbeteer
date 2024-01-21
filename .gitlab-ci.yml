@@ -2,6 +2,7 @@ image: eclipse-temurin:17
 
 stages:
   - build
+  - package
   - helmchart
   - release
 
@@ -35,13 +36,12 @@ buildTgz:
   artifacts:
     paths:
       - plumbeteer.tgz
+    expire_in: 1 days
 
 buildDocker:
   only:
     - tags
-  dependencies:
-    - buildTgz
-  stage: build
+  stage: package
   variables:
     STORAGE_DRIVER: vfs
     BUILDAH_FORMAT: docker
@@ -49,6 +49,7 @@ buildDocker:
   image: glubo/buildah
 
   script:
+    - ls
     - buildah login -u "$CI_REGISTRY_USER" --password $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - buildah images
     - buildah build -f Dockerfile -t $CI_REGISTRY_IMAGE:latest

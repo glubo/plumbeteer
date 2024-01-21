@@ -6,5 +6,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = "littlekt-game-template"
+rootProject.name = "plumbeteer"
 include("game")

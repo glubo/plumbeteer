@@ -1,4 +1,3 @@
-import Direction.RIGHT
 import com.lehaine.littlekt.Context
 import com.lehaine.littlekt.ContextListener
 import com.lehaine.littlekt.graphics.Color
@@ -6,104 +5,18 @@ import com.lehaine.littlekt.graphics.Fonts
 import com.lehaine.littlekt.graphics.g2d.*
 import com.lehaine.littlekt.graphics.g2d.shape.ShapeRenderer
 import com.lehaine.littlekt.graphics.gl.ClearBufferMask
-import com.lehaine.littlekt.graphics.toFloatBits
 import com.lehaine.littlekt.math.Rect
 import com.lehaine.littlekt.math.Vec2f
 import com.lehaine.littlekt.math.Vec2i
 import com.lehaine.littlekt.util.viewport.ExtendViewport
+import tile.EmptyTile
+import tile.Overflow
+import tile.StraightPipe
+import tile.Tile
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class Game(context: Context) : ContextListener(context) {
-    sealed interface TileEvent
-
-    data class Overflow(
-        val dt: Duration,
-        val direction: Direction,
-    ) : TileEvent
-
-    sealed interface Tile {
-        fun onRender(
-            target: Rect,
-            shapeRenderer: ShapeRenderer,
-            dt: Duration,
-        ): TileEvent?
-
-        fun takeLiquid(
-            direction: Direction,
-            dt: Duration,
-        ): Boolean
-
-        fun isEditable(): Boolean
-    }
-
-    data object EmptyTile : Tile {
-        override fun onRender(
-            target: Rect,
-            shapeRenderer: ShapeRenderer,
-            dt: Duration,
-        ): TileEvent? {
-            shapeRenderer.filledRectangle(
-                target,
-                color = Color.GRAY.toFloatBits(),
-            )
-
-            return null
-        }
-
-        override fun takeLiquid(direction: Direction, dt: Duration) = false
-        override fun isEditable() = true
-    }
-
-    class StraightPipe(
-        val length: Duration,
-    ) : Tile {
-        var elapsed = 0.seconds
-        var liquid = false
-        var filled = false
-
-        override fun onRender(
-            target: Rect,
-            shapeRenderer: ShapeRenderer,
-            dt: Duration,
-        ): TileEvent? {
-            shapeRenderer.filledRectangle(
-                target,
-            )
-
-            if (liquid) {
-                if (!filled) {
-                    elapsed += dt
-                }
-                shapeRenderer.filledRectangle(
-                    target.x,
-                    target.y,
-                    target.width * (elapsed / length).coerceAtMost(1.0).toFloat(),
-                    target.height,
-                    color = Color.GREEN.toFloatBits(),
-                )
-
-                if (!filled && liquid && elapsed > length) {
-                    filled = true
-                    return Overflow(
-                        elapsed - length,
-                        RIGHT,
-                    )
-                }
-            }
-            return null
-        }
-
-        override fun takeLiquid(direction: Direction, dt: Duration) = when {
-            liquid -> false
-            else -> {
-                liquid = true
-                true
-            }
-        }
-
-        override fun isEditable() = !liquid
-    }
 
     sealed interface FieldEvent
 
@@ -177,7 +90,7 @@ class Game(context: Context) : ContextListener(context) {
             if (getTileRect(x, y).intersects(pos.x, pos.y, pos.x, pos.y)) {
                 val currentTile = tiles[x][y]
                 if (currentTile.isEditable()) {
-                    tiles[x][y] = StraightPipe(2.seconds)
+                    tiles[x][y] = StraightPipe(2.seconds, Orientation.entries.random())
                 }
             }
         }
@@ -189,23 +102,25 @@ class Game(context: Context) : ContextListener(context) {
         val viewport = ExtendViewport(960, 540)
         val camera = viewport.camera
 
-        val startDuration = 10.seconds
+        val startDuration = 4.seconds
         var startTimer = startDuration
         var started = false
 
         var gameOver = false
 
         val field = PlayField(
-            rect = Rect(-860 / 2f, -440 / 2f, 860f, 440f),
-            4,
-            2
+            rect = Rect(-860 / 2f, -440 / 2f, 628f, 440f),
+            10,
+            7
         )
 
         val processor =
             input.inputProcessor {
                 onTouchUp { screenX, screenY, pointer ->
-                    val worldPos = viewport.camera.screenToWorld(context, Vec2f(screenX, screenY))
-                    field.onTouchUp(worldPos)
+                    if (!gameOver) {
+                        val worldPos = viewport.camera.screenToWorld(context, Vec2f(screenX, screenY))
+                        field.onTouchUp(worldPos)
+                    }
                 }
             }
 
@@ -240,7 +155,7 @@ class Game(context: Context) : ContextListener(context) {
                 }
 
                 if (!started && startTimer == 0.seconds) {
-                    field.tiles.first().first().takeLiquid(RIGHT, dt)
+                    field.tiles.first().first().takeLiquid(Direction.RIGHT, dt)
                 }
 
                 if (gameOver) {

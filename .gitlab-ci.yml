@@ -39,15 +39,15 @@ buildDocker:
 #    -Djib.to.auth.password=${CI_REGISTRY_PASSWORD}
 #    -Djib.container.creationTime=$(date -Iseconds)
 
-buildHelm:
-  only:
-    - tags
-  stage: helmchart
-  image: alpine/helm
-  script:
-    - helm plugin install https://github.com/chartmuseum/helm-push
-    - helm package helm/fluffcon --version "${CI_COMMIT_REF_NAME}" --app-version "${CI_COMMIT_REF_NAME}"
-    - echo helm repo add --username PRIVATE-TOKEN --password "${NYX_TOKEN}" gitlab "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/main"
-    - helm repo add --username PRIVATE-TOKEN --password "${NYX_TOKEN}" gitlab "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/main"
-    - helm repo list
-    - helm cm-push "fluffcon-${CI_COMMIT_REF_NAME}.tgz" gitlab
+#buildHelm:
+#  only:
+#    - tags
+#  stage: helmchart
+#  image: alpine/helm
+#  script:
+#    - helm plugin install https://github.com/chartmuseum/helm-push
+#    - helm package helm/fluffcon --version "${CI_COMMIT_REF_NAME}" --app-version "${CI_COMMIT_REF_NAME}"
+#    - echo helm repo add --username PRIVATE-TOKEN --password "${NYX_TOKEN}" gitlab "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/main"
+#    - helm repo add --username PRIVATE-TOKEN --password "${NYX_TOKEN}" gitlab "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/main"
+#    - helm repo list
+#    - helm cm-push "fluffcon-${CI_COMMIT_REF_NAME}.tgz" gitlab

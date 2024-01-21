@@ -1,0 +1,11 @@
+---
+preset: extended
+initialVersion: "0.0.1"
+releaseTypes:
+  publicationServices: []
+#    - gitlab
+  items:
+    mainline:
+      gitCommit: "true"
+      gitPush: "true"
+      gitTag: "true"

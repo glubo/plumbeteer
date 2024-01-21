@@ -1,0 +1,53 @@
+image: eclipse-temurin:17
+
+stages:
+  - build
+#  - helmchart
+  - release
+
+release:
+  variables:
+    GIT_STRATEGY: clone
+    GIT_DEPTH: "0"
+    NYX_VERBOSITY: INFO
+#    NYX_CHANGELOG_PATH: CHANGELOG.md
+  image: mooltiverse/nyx:latest
+  only:
+    - main
+  stage: release
+  script:
+    - git config --global user.name "Nyx pipeline"
+    - git config --global user.email nyxrobot@glubo.cz
+    - git checkout -B "$CI_COMMIT_REF_NAME" "$CI_COMMIT_SHA"
+    - nyx publish --git-remotes-origin-password=$NYX_TOKEN --git-remotes-origin-user=PRIVATE-TOKEN
+    - git tag
+    - git log
+    - ls -R
+    - find / -name CHANGELOG.md ||true
+
+
+buildDocker:
+  only:
+    - tags
+  stage: build
+  script: >
+    ./gradlew jsBrowserDistribution
+#    ./gradlew jib
+#    -Djib.to.image=${CI_REGISTRY_IMAGE}:latest
+#    -Djib.to.tags=latest,${CI_COMMIT_REF_NAME}
+#    -Djib.to.auth.username=${CI_REGISTRY_USER}
+#    -Djib.to.auth.password=${CI_REGISTRY_PASSWORD}
+#    -Djib.container.creationTime=$(date -Iseconds)
+
+buildHelm:
+  only:
+    - tags
+  stage: helmchart
+  image: alpine/helm
+  script:
+    - helm plugin install https://github.com/chartmuseum/helm-push
+    - helm package helm/fluffcon --version "${CI_COMMIT_REF_NAME}" --app-version "${CI_COMMIT_REF_NAME}"
+    - echo helm repo add --username PRIVATE-TOKEN --password "${NYX_TOKEN}" gitlab "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/main"
+    - helm repo add --username PRIVATE-TOKEN --password "${NYX_TOKEN}" gitlab "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/main"
+    - helm repo list
+    - helm cm-push "fluffcon-${CI_COMMIT_REF_NAME}.tgz" gitlab

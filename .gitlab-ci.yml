@@ -2,7 +2,7 @@ image: eclipse-temurin:17
 
 stages:
   - build
-#  - helmchart
+  - helmchart
   - release
 
 release:
@@ -10,7 +10,7 @@ release:
     GIT_STRATEGY: clone
     GIT_DEPTH: "0"
     NYX_VERBOSITY: INFO
-#    NYX_CHANGELOG_PATH: CHANGELOG.md
+  #    NYX_CHANGELOG_PATH: CHANGELOG.md
   image: mooltiverse/nyx:latest
   only:
     - main
@@ -25,13 +25,33 @@ release:
     - ls -R
     - find / -name CHANGELOG.md ||true
 
-
-buildDocker:
+buildTgz:
   only:
     - tags
   stage: build
   script: >
     ./gradlew jsBrowserDistribution
+    tar -czf plumbeteer.tgz -C game/build/dist/js/productionExecutable/ .
+  artifacts:
+    plumbeteer.tgz
+
+buildDocker:
+  only:
+    - tags
+  stage: build
+  variables:
+    STORAGE_DRIVER: vfs
+    BUILDAH_FORMAT: docker
+    BUILDAH_ISOLATION: chroot
+  image: registry.gitlab.com/g3476/buildah
+  script: >
+    buildah login -u "$CI_REGISTRY_USER" --password $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    buildah images
+    buildah build -f Dockerfile -t $CI_REGISTRY_IMAGE:latest
+    buildah images
+    buildah push $CI_REGISTRY_IMAGE:latest
+
+
 #    ./gradlew jib
 #    -Djib.to.image=${CI_REGISTRY_IMAGE}:latest
 #    -Djib.to.tags=latest,${CI_COMMIT_REF_NAME}
@@ -39,15 +59,15 @@ buildDocker:
 #    -Djib.to.auth.password=${CI_REGISTRY_PASSWORD}
 #    -Djib.container.creationTime=$(date -Iseconds)
 
-#buildHelm:
-#  only:
-#    - tags
-#  stage: helmchart
-#  image: alpine/helm
-#  script:
-#    - helm plugin install https://github.com/chartmuseum/helm-push
-#    - helm package helm/fluffcon --version "${CI_COMMIT_REF_NAME}" --app-version "${CI_COMMIT_REF_NAME}"
-#    - echo helm repo add --username PRIVATE-TOKEN --password "${NYX_TOKEN}" gitlab "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/main"
-#    - helm repo add --username PRIVATE-TOKEN --password "${NYX_TOKEN}" gitlab "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/main"
-#    - helm repo list
-#    - helm cm-push "fluffcon-${CI_COMMIT_REF_NAME}.tgz" gitlab
+buildHelm:
+  only:
+    - tags
+  stage: helmchart
+  image: alpine/helm
+  script:
+    - helm plugin install https://github.com/chartmuseum/helm-push
+    - helm package helm/fluffcon --version "${CI_COMMIT_REF_NAME}" --app-version "${CI_COMMIT_REF_NAME}"
+    - echo helm repo add --username PRIVATE-TOKEN --password "${NYX_TOKEN}" gitlab "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/main"
+    - helm repo add --username PRIVATE-TOKEN --password "${NYX_TOKEN}" gitlab "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/main"
+    - helm repo list
+    - helm cm-push "fluffcon-${CI_COMMIT_REF_NAME}.tgz" gitlab

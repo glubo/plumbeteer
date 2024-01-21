@@ -46,12 +46,12 @@ buildDocker:
     BUILDAH_ISOLATION: chroot
   image: glubo/buildah
 
-  script: >
-    buildah login -u "$CI_REGISTRY_USER" --password $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    buildah images
-    buildah build -f Dockerfile -t $CI_REGISTRY_IMAGE:latest
-    buildah images
-    buildah push $CI_REGISTRY_IMAGE:latest
+  script:
+    - buildah login -u "$CI_REGISTRY_USER" --password $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - buildah images
+    - buildah build -f Dockerfile -t $CI_REGISTRY_IMAGE:latest
+    - buildah images
+    - buildah push $CI_REGISTRY_IMAGE:latest
 
 
 #    ./gradlew jib

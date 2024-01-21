@@ -1,5 +1,6 @@
 package com.game.template
 
+import Game
 import com.lehaine.littlekt.createLittleKtApp
 import com.lehaine.littlekt.graphics.Color
 
@@ -8,7 +9,7 @@ fun main() {
         width = 960
         height = 540
         backgroundColor = Color.DARK_GRAY
-        title = "LittleKt Game Template"
+        title = "Plumbeteer"
     }.start {
         Game(it)
     }

@@ -1,5 +1,4 @@
-package com.game.template
-
+import Direction.RIGHT
 import com.lehaine.littlekt.Context
 import com.lehaine.littlekt.ContextListener
 import com.lehaine.littlekt.graphics.Color
@@ -20,7 +19,7 @@ class Game(context: Context) : ContextListener(context) {
 
     data class Overflow(
         val dt: Duration,
-        val direction: Vec2i,
+        val direction: Direction,
     ) : TileEvent
 
     sealed interface Tile {
@@ -31,7 +30,7 @@ class Game(context: Context) : ContextListener(context) {
         ): TileEvent?
 
         fun takeLiquid(
-            direction: Vec2i,
+            direction: Direction,
             dt: Duration,
         ): Boolean
 
@@ -52,7 +51,7 @@ class Game(context: Context) : ContextListener(context) {
             return null
         }
 
-        override fun takeLiquid(direction: Vec2i, dt: Duration) = false
+        override fun takeLiquid(direction: Direction, dt: Duration) = false
         override fun isEditable() = true
     }
 
@@ -88,14 +87,14 @@ class Game(context: Context) : ContextListener(context) {
                     filled = true
                     return Overflow(
                         elapsed - length,
-                        Vec2i(1, 0),
+                        RIGHT,
                     )
                 }
             }
             return null
         }
 
-        override fun takeLiquid(direction: Vec2i, dt: Duration) = when {
+        override fun takeLiquid(direction: Direction, dt: Duration) = when {
             liquid -> false
             else -> {
                 liquid = true
@@ -141,8 +140,8 @@ class Game(context: Context) : ContextListener(context) {
 
                     when (event) {
                         is Overflow -> {
-                            val newTile = tiles.getOrNull(x + event.direction.x)
-                                ?.getOrNull(y + event.direction.y)
+                            val pos = event.direction.vec + Vec2i(x, y)
+                            val newTile = getTileOrNull(pos)
                             if (newTile == null) {
                                 result = GameOver()
                             } else {
@@ -159,6 +158,9 @@ class Game(context: Context) : ContextListener(context) {
             return result
         }
 
+        private fun getTileOrNull(vec: Vec2i) = tiles.getOrNull(vec.x)
+            ?.getOrNull(vec.y)
+
         private fun getTileRect(x: Int, y: Int) = Rect(
             rect.x + x * tileWidth,
             rect.y + y * tileHeight,
@@ -168,17 +170,13 @@ class Game(context: Context) : ContextListener(context) {
 
         fun onTouchUp(pos: Vec2f) {
             if (!rect.intersects(pos.x, pos.y, pos.x, pos.y)) {
-                println("Not intersecting")
                 return
             }
             val x = ((pos.x - rect.x) / tileWidth).toInt()
             val y = ((pos.y - rect.y) / tileHeight).toInt()
-            println("$x $y")
             if (getTileRect(x, y).intersects(pos.x, pos.y, pos.x, pos.y)) {
-                println("asd $x $y")
                 val currentTile = tiles[x][y]
                 if (currentTile.isEditable()) {
-                    println("setting $x $y")
                     tiles[x][y] = StraightPipe(2.seconds)
                 }
             }
@@ -231,7 +229,7 @@ class Game(context: Context) : ContextListener(context) {
                         470f,
                         -270f,
                         40f,
-                        500f*timerLeft.toFloat(),
+                        500f * timerLeft.toFloat(),
                     )
 
                 )
@@ -242,7 +240,7 @@ class Game(context: Context) : ContextListener(context) {
                 }
 
                 if (!started && startTimer == 0.seconds) {
-                    field.tiles.first().first().takeLiquid(Vec2i(1,0),dt)
+                    field.tiles.first().first().takeLiquid(RIGHT, dt)
                 }
 
                 if (gameOver) {
@@ -252,3 +250,5 @@ class Game(context: Context) : ContextListener(context) {
         }
     }
 }
+
+

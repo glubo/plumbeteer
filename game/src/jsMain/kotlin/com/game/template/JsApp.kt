@@ -1,5 +1,6 @@
 package com.game.template
 
+import Game
 import com.lehaine.littlekt.createLittleKtApp
 import com.lehaine.littlekt.graphics.Color
 

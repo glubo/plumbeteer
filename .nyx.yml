@@ -6,6 +6,6 @@ releaseTypes:
 #    - gitlab
   items:
     mainline:
-      gitCommit: "true"
+      gitCommit: "false"
       gitPush: "true"
       gitTag: "true"

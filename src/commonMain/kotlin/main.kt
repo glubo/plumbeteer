@@ -1,3 +1,4 @@
+import korlibs.image.atlas.*
 import korlibs.time.*
 import korlibs.korge.*
 import korlibs.korge.scene.*
@@ -16,17 +17,30 @@ suspend fun main() = Korge(windowSize = Size(512, 512), backgroundColor = Colors
 	sceneContainer.changeTo({ MyScene() })
 }
 
+
+
+
 class MyScene : Scene() {
 	override suspend fun SContainer.sceneMain() {
 		val minDegrees = (-16).degrees
 		val maxDegrees = (+16).degrees
 
+        val atlas = resourcesVfs["texture.json"].readAtlas()
 		val image = image(resourcesVfs["korge.png"].readBitmap()) {
 			rotation = maxDegrees
 			anchor(.5, .5)
-			scale(0.8)
+			scale(0.1)
 			position(256, 256)
 		}
+
+
+        val field = PlayField(
+            Rectangle(0,0, 400, 400),
+            xtiles = 10,
+            ytiles = 10,
+            this,
+            Assets(atlas)
+        )
 
 		while (true) {
 			image.tween(image::rotation[minDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)

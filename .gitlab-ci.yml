@@ -32,7 +32,7 @@ buildTgz:
   stage: build
   script:
     - ./gradlew jsBrowserDistribution
-    - tar -czf plumbeteer.tgz -C game/build/dist/js/productionExecutable/ .
+    - tar -czf plumbeteer.tgz -C build/dist/js/productionExecutable/ .
   artifacts:
     paths:
       - plumbeteer.tgz

@@ -1,14 +1,16 @@
 package tile
 
+import Assets
 import Direction
-import com.lehaine.littlekt.graphics.g2d.shape.ShapeRenderer
+import com.lehaine.littlekt.graphics.g2d.Batch
 import com.lehaine.littlekt.math.Rect
 import kotlin.time.Duration
 
 sealed interface Tile {
     fun onRender(
         target: Rect,
-        shapeRenderer: ShapeRenderer,
+        assets: Assets,
+        batch: Batch,
         dt: Duration,
     ): TileEvent?
 

@@ -1,10 +1,14 @@
 import com.lehaine.littlekt.Context
 import com.lehaine.littlekt.ContextListener
+import com.lehaine.littlekt.file.vfs.readAtlas
+import com.lehaine.littlekt.file.vfs.readTexture
+import com.lehaine.littlekt.graph.node.resource.toDrawable
 import com.lehaine.littlekt.graphics.Color
 import com.lehaine.littlekt.graphics.Fonts
 import com.lehaine.littlekt.graphics.g2d.*
 import com.lehaine.littlekt.graphics.g2d.shape.ShapeRenderer
 import com.lehaine.littlekt.graphics.gl.ClearBufferMask
+import com.lehaine.littlekt.graphics.slice
 import com.lehaine.littlekt.math.Rect
 import com.lehaine.littlekt.math.Vec2f
 import com.lehaine.littlekt.math.Vec2i
@@ -26,8 +30,8 @@ class Game(context: Context) : ContextListener(context) {
         xtiles: Int,
         ytiles: Int,
     ) {
-        val tileWidth = rect.width / xtiles
-        val tileHeight = rect.height / ytiles
+        val tileWidth = 32f
+        val tileHeight = 32f
 
         val tiles =
             (1..xtiles).map { _ ->
@@ -37,7 +41,8 @@ class Game(context: Context) : ContextListener(context) {
             }
 
         fun onRender(
-            shapeRenderer: ShapeRenderer,
+            assets: Assets,
+            batch: Batch,
             dt: Duration,
         ): FieldEvent? {
             var result: FieldEvent? = null
@@ -48,7 +53,8 @@ class Game(context: Context) : ContextListener(context) {
                     val event =
                         tile.onRender(
                             tileRect,
-                            shapeRenderer,
+                            assets,
+                            batch,
                             dt,
                         )
 
@@ -82,8 +88,8 @@ class Game(context: Context) : ContextListener(context) {
         ) = Rect(
             rect.x + x * tileWidth,
             rect.y + y * tileHeight,
-            tileWidth * 0.95f,
-            tileHeight * 0.95f,
+            tileWidth,
+            tileHeight,
         )
 
         fun onTouchUp(pos: Vec2f) {
@@ -106,6 +112,8 @@ class Game(context: Context) : ContextListener(context) {
         val shapeRenderer = ShapeRenderer(batch)
         val viewport = ExtendViewport(960, 540)
         val camera = viewport.camera
+        val atlas = resourcesVfs["tiles.atlas.json"].readAtlas()
+        val assets = Assets(atlas)
 
         val startDuration = 4.seconds
         var startTimer = startDuration
@@ -142,7 +150,8 @@ class Game(context: Context) : ContextListener(context) {
             batch.use(camera.viewProjection) {
                 val event =
                     field.onRender(
-                        shapeRenderer,
+                        assets,
+                        batch,
                         dt,
                     )
 
@@ -171,4 +180,36 @@ class Game(context: Context) : ContextListener(context) {
             }
         }
     }
+}
+
+data class Assets(val atlas: TextureAtlas) {
+    val empty = atlas.getByPrefix("empty").slice
+    val corner = atlas.getByPrefix("corner").slice
+    val straightH = atlas.getByPrefix("straightH").slice
+    val straightV = atlas.getByPrefix("straightV").slice
+    val cornerFluid = (1..8).map {
+        atlas.getByPrefix("corner-fluid$it").slice
+    }
+    val straightFluid = (1..7).map {
+        atlas.getByPrefix("straight-fluid$it").slice
+    }
+}
+fun TextureSlice.easyDraw(
+    batch: Batch,
+    x: Float,
+    y: Float,
+    width: Float,
+    height: Float,
+) {
+//    this.toDrawable().draw(
+//        batch,
+//        x, y,
+////        width, height
+//    )
+    batch.draw(
+        slice = this,
+        x = x,
+        y = y,
+
+    )
 }

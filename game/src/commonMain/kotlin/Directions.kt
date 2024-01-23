@@ -3,6 +3,7 @@ import Direction.LEFT
 import Direction.RIGHT
 import Direction.UP
 import com.lehaine.littlekt.math.Vec2i
+import com.lehaine.littlekt.math.geom.Angle
 
 enum class Direction(
     val vec: Vec2i,
@@ -33,6 +34,15 @@ enum class Direction(
             LEFT -> RIGHT
             RIGHT -> LEFT
         }
+}
+
+enum class Rotation(
+    val angle: Angle
+) {
+    D0(Angle.ZERO),
+    D90(Angle.fromDegrees(90)),
+    D180(Angle.fromDegrees(180)),
+    D270(Angle.fromDegrees(270)),
 }
 
 enum class Orientation(

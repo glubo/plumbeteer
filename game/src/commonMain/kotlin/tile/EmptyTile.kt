@@ -1,21 +1,20 @@
 package tile
 
+import Assets
 import Direction
-import com.lehaine.littlekt.graphics.Color
-import com.lehaine.littlekt.graphics.g2d.shape.ShapeRenderer
-import com.lehaine.littlekt.graphics.toFloatBits
+import com.lehaine.littlekt.graphics.g2d.Batch
 import com.lehaine.littlekt.math.Rect
+import easyDraw
 import kotlin.time.Duration
 
 data object EmptyTile : Tile {
-    override fun onRender(
-        target: Rect,
-        shapeRenderer: ShapeRenderer,
-        dt: Duration,
-    ): TileEvent? {
-        shapeRenderer.filledRectangle(
-            target,
-            color = Color.WHITE.toFloatBits(),
+    override fun onRender(target: Rect, assets: Assets, batch: Batch, dt: Duration): TileEvent? {
+        assets.empty.easyDraw(
+            batch,
+            target.x,
+            target.y,
+            target.width,
+            target.height
         )
 
         return null

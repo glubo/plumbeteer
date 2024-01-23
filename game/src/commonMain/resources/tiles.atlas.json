@@ -1,0 +1,416 @@
+{
+    "meta": {
+        "app": "https://littlekt.com",
+        "version": "1.0",
+        "image": "tiles.atlas.png",
+        "format": "RGBA8888",
+        "scale": 1.0,
+        "size": {
+            "w": 128,
+            "h": 64
+        },
+        "related_multi_packs": [
+        ]
+    },
+    "frames": [
+        {
+            "filename": "corner",
+            "frame": {
+                "x": 44,
+                "y": 36,
+                "w": 22,
+                "h": 23
+            },
+            "rotated": true,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 9,
+                "y": 0,
+                "w": 23,
+                "h": 22
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "corner-fluid1",
+            "frame": {
+                "x": 94,
+                "y": 31,
+                "w": 5,
+                "h": 6
+            },
+            "rotated": false,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 27,
+                "y": 13,
+                "w": 5,
+                "h": 6
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "corner-fluid2",
+            "frame": {
+                "x": 86,
+                "y": 46,
+                "w": 9,
+                "h": 6
+            },
+            "rotated": false,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 23,
+                "y": 13,
+                "w": 9,
+                "h": 6
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "corner-fluid3",
+            "frame": {
+                "x": 86,
+                "y": 31,
+                "w": 6,
+                "h": 13
+            },
+            "rotated": true,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 19,
+                "y": 13,
+                "w": 13,
+                "h": 6
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "corner-fluid4",
+            "frame": {
+                "x": 68,
+                "y": 56,
+                "w": 18,
+                "h": 6
+            },
+            "rotated": false,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 14,
+                "y": 13,
+                "w": 18,
+                "h": 6
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "corner-fluid5",
+            "frame": {
+                "x": 52,
+                "y": 25,
+                "w": 19,
+                "h": 8
+            },
+            "rotated": false,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 13,
+                "y": 11,
+                "w": 19,
+                "h": 8
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "corner-fluid6",
+            "frame": {
+                "x": 60,
+                "y": 2,
+                "w": 12,
+                "h": 19
+            },
+            "rotated": true,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 13,
+                "y": 7,
+                "w": 19,
+                "h": 12
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "corner-fluid7",
+            "frame": {
+                "x": 68,
+                "y": 35,
+                "w": 16,
+                "h": 19
+            },
+            "rotated": true,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 13,
+                "y": 3,
+                "w": 19,
+                "h": 16
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "corner-fluid8",
+            "frame": {
+                "x": 74,
+                "y": 2,
+                "w": 19,
+                "h": 19
+            },
+            "rotated": false,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 13,
+                "y": 0,
+                "w": 19,
+                "h": 19
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "empty",
+            "frame": {
+                "x": 2,
+                "y": 2,
+                "w": 32,
+                "h": 32
+            },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 32,
+                "h": 32
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "straight-fluid1",
+            "frame": {
+                "x": 94,
+                "y": 39,
+                "w": 6,
+                "h": 5
+            },
+            "rotated": false,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 13,
+                "y": 27,
+                "w": 6,
+                "h": 5
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "straight-fluid2",
+            "frame": {
+                "x": 88,
+                "y": 54,
+                "w": 9,
+                "h": 6
+            },
+            "rotated": true,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 13,
+                "y": 23,
+                "w": 6,
+                "h": 9
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "straight-fluid3",
+            "frame": {
+                "x": 92,
+                "y": 23,
+                "w": 13,
+                "h": 6
+            },
+            "rotated": true,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 13,
+                "y": 19,
+                "w": 6,
+                "h": 13
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "straight-fluid4",
+            "frame": {
+                "x": 73,
+                "y": 23,
+                "w": 17,
+                "h": 6
+            },
+            "rotated": true,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 13,
+                "y": 15,
+                "w": 6,
+                "h": 17
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "straight-fluid5",
+            "frame": {
+                "x": 52,
+                "y": 2,
+                "w": 6,
+                "h": 21
+            },
+            "rotated": false,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 13,
+                "y": 11,
+                "w": 6,
+                "h": 21
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "straight-fluid6",
+            "frame": {
+                "x": 36,
+                "y": 36,
+                "w": 6,
+                "h": 25
+            },
+            "rotated": false,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 13,
+                "y": 7,
+                "w": 6,
+                "h": 25
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "straight-fluid7",
+            "frame": {
+                "x": 2,
+                "y": 36,
+                "w": 32,
+                "h": 6
+            },
+            "rotated": true,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 13,
+                "y": 0,
+                "w": 6,
+                "h": 32
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "straightH",
+            "frame": {
+                "x": 2,
+                "y": 44,
+                "w": 32,
+                "h": 14
+            },
+            "rotated": false,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 9,
+                "w": 32,
+                "h": 14
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        },
+        {
+            "filename": "straightV",
+            "frame": {
+                "x": 36,
+                "y": 2,
+                "w": 14,
+                "h": 32
+            },
+            "rotated": false,
+            "trimmed": true,
+            "spriteSourceSize": {
+                "x": 9,
+                "y": 0,
+                "w": 14,
+                "h": 32
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            }
+        }
+    ]
+}

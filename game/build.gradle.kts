@@ -1,3 +1,6 @@
+import com.lehaine.littlekt.gradle.texturepacker.littleKt
+import com.lehaine.littlekt.gradle.texturepacker.packing
+import com.lehaine.littlekt.gradle.texturepacker.texturePacker
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
@@ -8,11 +11,11 @@ repositories {
 
 plugins {
     kotlin("multiplatform")
-    id("com.android.application")
+//    id("com.android.application")
 }
 
 kotlin {
-    androidTarget()
+//    androidTarget()
     jvm {
         compilations {
             val main by getting
@@ -97,26 +100,26 @@ kotlin {
             }
         }
         val jsTest by getting
-        val androidMain by getting
+//        val androidMain by getting
     }
 }
 
-android {
-    sourceSets["main"].apply {
-        manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        assets.srcDirs("src/commonMain/resources")
-    }
-    compileSdk = (findProperty("android.compileSdk") as String).toInt()
-
-    defaultConfig {
-        minSdk = (findProperty("android.minSdk") as String).toInt()
-        targetSdk = (findProperty("android.targetSdk") as String).toInt()
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-}
+//android {
+//    sourceSets["main"].apply {
+//        manifest.srcFile("src/androidMain/AndroidManifest.xml")
+//        assets.srcDirs("src/commonMain/resources")
+//    }
+//    compileSdk = (findProperty("android.compileSdk") as String).toInt()
+//
+//    defaultConfig {
+//        minSdk = (findProperty("android.minSdk") as String).toInt()
+//        targetSdk = (findProperty("android.targetSdk") as String).toInt()
+//    }
+//    compileOptions {
+//        sourceCompatibility = JavaVersion.VERSION_17
+//        targetCompatibility = JavaVersion.VERSION_17
+//    }
+//}
 
 rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
     versions.webpackCli.version = "4.10.0"

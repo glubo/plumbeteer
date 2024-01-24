@@ -120,7 +120,7 @@ data class Assets(val atlas: Atlas) {
     val straightFluid =
         SpriteAnimation(
             listOf(transparent) +
-                (1..7).map {
+                (1..8).map {
                     atlas["straight-fluid$it"]
                 },
         )

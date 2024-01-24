@@ -78,8 +78,8 @@ class StraightPipe(
             }
 
             val elapsedRatio = (elapsed / length).coerceAtMost(0.9999)
-            val frame = (liquidView.totalFrames * elapsedRatio).toInt()
-            liquidView.setFrame(frame)
+            val frame = ((liquidView.totalFrames - 1) * elapsedRatio).toInt()
+            liquidView.setFrame(1 + frame)
 
             if (!filled && liquidDirection != null && elapsed > length) {
                 filled = true

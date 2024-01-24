@@ -2,9 +2,11 @@ import Direction.DOWN
 import Direction.LEFT
 import Direction.RIGHT
 import Direction.UP
-import korlibs.math.geom.*
+import korlibs.math.geom.Angle
+import korlibs.math.geom.Vector2I
 
 typealias Vec2i = Vector2I
+
 enum class Direction(
     val vec: Vector2I,
     val char: Char,
@@ -37,7 +39,7 @@ enum class Direction(
 }
 
 enum class Rotation(
-    val angle: Angle
+    val angle: Angle,
 ) {
     D0(Angle.ZERO),
     D90(Angle.fromDegrees(90)),

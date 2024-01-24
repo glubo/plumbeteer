@@ -2,23 +2,26 @@ package tile
 
 import Assets
 import Direction
-import korlibs.korge.view.*
-import korlibs.math.geom.*
+import korlibs.korge.view.SContainer
+import korlibs.korge.view.position
+import korlibs.korge.view.size
+import korlibs.korge.view.sprite
+import korlibs.math.geom.Rectangle
 import kotlin.time.Duration
 
-class EmptyTile : Tile {
-    private var view: View? = null
-    override fun bindView(target: Rectangle, assets: Assets, sContainer: SContainer) {
+class EmptyTile : Tile() {
+    override fun bindView(
+        target: Rectangle,
+        assets: Assets,
+        sContainer: SContainer,
+    ) {
         release()
-        view = sContainer.image(assets.empty) {
-            position(target.x, target.y)
-            size(target.size)
-        }
-    }
-
-    override fun release() {
-        view?.removeFromParent()
-        view = null
+        views.add(
+            sContainer.sprite(assets.empty) {
+                position(target.x, target.y)
+                size(target.size)
+            },
+        )
     }
 
     override fun onUpdate(dt: Duration) = null

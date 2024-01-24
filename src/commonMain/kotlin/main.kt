@@ -1,50 +1,75 @@
-import korlibs.image.atlas.*
-import korlibs.time.*
-import korlibs.korge.*
-import korlibs.korge.scene.*
-import korlibs.korge.tween.*
-import korlibs.korge.view.*
-import korlibs.image.color.*
-import korlibs.image.format.*
-import korlibs.io.file.std.*
-import korlibs.math.geom.*
-import korlibs.math.interpolation.*
+import korlibs.image.atlas.readAtlas
+import korlibs.image.color.Colors
+import korlibs.image.format.PNG
+import korlibs.image.format.RegisteredImageFormats
+import korlibs.io.file.std.resourcesVfs
+import korlibs.korge.Korge
+import korlibs.korge.input.mouse
+import korlibs.korge.scene.Scene
+import korlibs.korge.scene.sceneContainer
+import korlibs.korge.view.SContainer
+import korlibs.korge.view.addUpdater
+import korlibs.math.geom.Rectangle
+import korlibs.math.geom.Size
+import korlibs.math.geom.toInt
+import kotlin.time.Duration.Companion.seconds
 
-suspend fun main() = Korge(windowSize = Size(512, 512), backgroundColor = Colors["#2b2b2b"]) {
-	val sceneContainer = sceneContainer()
+suspend fun main() =
+    Korge(windowSize = Size(512, 512), backgroundColor = Colors["#2b2b2b"]) {
+        val sceneContainer = sceneContainer()
 
-    RegisteredImageFormats.register(PNG)
-	sceneContainer.changeTo({ MyScene() })
-}
-
-
-
+        RegisteredImageFormats.register(PNG)
+        sceneContainer.changeTo({ MyScene() })
+    }
 
 class MyScene : Scene() {
-	override suspend fun SContainer.sceneMain() {
-		val minDegrees = (-16).degrees
-		val maxDegrees = (+16).degrees
-
+    override suspend fun SContainer.sceneMain() {
         val atlas = resourcesVfs["texture.json"].readAtlas()
-		val image = image(resourcesVfs["korge.png"].readBitmap()) {
-			rotation = maxDegrees
-			anchor(.5, .5)
-			scale(0.1)
-			position(256, 256)
-		}
+        val startDuration = 4.seconds
+        var startTimer = startDuration
+        var started = false
+        var gameOver = false
 
+        val field =
+            PlayField(
+                Rectangle(0, 0, 400, 400),
+                xtiles = 10,
+                ytiles = 10,
+                this,
+                Assets(atlas),
+            )
 
-        val field = PlayField(
-            Rectangle(0,0, 400, 400),
-            xtiles = 10,
-            ytiles = 10,
-            this,
-            Assets(atlas)
-        )
+        addUpdater { dt ->
+            startTimer = (startTimer - dt).coerceAtLeast(0.seconds)
 
-		while (true) {
-			image.tween(image::rotation[minDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
-			image.tween(image::rotation[maxDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
-		}
-	}
+            val timerLeft = startTimer / startDuration
+            val event = field.onUpdate(dt)
+            when (event) {
+                is GameOver -> gameOver = true
+                null -> {}
+            }
+            if (!started && startTimer == 0.seconds) {
+                field.tiles.first().first().takeLiquid(Direction.RIGHT, dt)
+            }
+        }
+//
+//    onRender { dt ->
+//
+//
+//
+//
+//
+//            if (gameOver) {
+//                Fonts.default.draw(it, "Game Over!", -15f, 0f)
+//            }
+//        }
+//    }
+// }
+
+        this.mouse {
+            onClick {
+                field.onTouchUp(it.currentPosLocal.toInt())
+            }
+        }
+    }
 }

@@ -3,92 +3,83 @@ package tile
 import Assets
 import Direction
 import Orientation
-import Rotation
-import korlibs.korge.view.*
-import korlibs.math.geom.*
+import korlibs.korge.view.SContainer
+import korlibs.korge.view.Sprite
+import korlibs.korge.view.centered
+import korlibs.korge.view.image
+import korlibs.korge.view.position
+import korlibs.korge.view.rotation
+import korlibs.korge.view.size
+import korlibs.korge.view.sprite
+import korlibs.math.geom.Angle
+import korlibs.math.geom.Rectangle
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class StraightPipe(
     val length: Duration,
     val orientation: Orientation,
-) : Tile {
+) : Tile() {
     var elapsed = 0.seconds
     var liquidDirection: Direction? = null
     var filled = false
-    override fun bindView(target: Rectangle, assets: Assets, sContainer: SContainer) {
-        TODO("Not yet implemented")
+    lateinit var liquidView: Sprite
+
+    override fun bindView(
+        target: Rectangle,
+        assets: Assets,
+        sContainer: SContainer,
+    ) {
+        release()
+        views.add(
+            sContainer.image(
+                assets.empty,
+            ) {
+                position(target.centerX, target.centerY)
+                centered
+                size(target.size)
+            },
+        )
+        views.add(
+            sContainer.image(
+                assets.straightV,
+            ) {
+                position(target.centerX, target.centerY)
+                centered
+                size(target.size)
+                rotation(angle())
+            },
+        )
+        liquidView =
+            sContainer.sprite(
+                assets.straightFluid,
+            ) {
+                position(target.centerX, target.centerY)
+                centered
+                size(target.size)
+                setFrame(0)
+                rotation(angle())
+            }
+        views.add(
+            liquidView,
+        )
     }
 
-    override fun release() {
-        TODO("Not yet implemented")
-    }
+    private fun angle() =
+        when (orientation) {
+            Orientation.VERTICAL -> Angle.ZERO
+            Orientation.HORIZONTAL -> Angle.QUARTER
+        }
 
     override fun onUpdate(dt: Duration): TileEvent? {
-//        assets.empty.easyDraw(
-//            batch = batch,
-//            x = target.x,
-//            y = target.y,
-//            width = target.width,
-//            height = target.height
-//        )
-//
-//        val slice = when (orientation) {
-//            Orientation.VERTICAL -> assets.straightV
-//            Orientation.HORIZONTAL -> assets.straightH
-//        }
-//
-//        slice.easyDraw(
-//            batch = batch,
-//            x = target.x,
-//            y = target.y,
-//            width = target.width,
-//            height = target.height,
-//        )
-
         if (liquidDirection != null) {
             if (!filled) {
                 elapsed += dt
             }
-//            when (liquidDirection) {
-//                Direction.UP ->
-//                    shapeRenderer.filledRectangle(
-//                        target.x + target.width * 0.33333f,
-//                        target.y + target.height,
-//                        target.width * 0.333333f,
-//                        -target.height * (elapsed / length).coerceAtMost(1.0).toFloat(),
-//                        color = Color.GREEN.toFloatBits(),
-//                    )
-//
-//                Direction.DOWN ->
-//                    shapeRenderer.filledRectangle(
-//                        target.x + target.width * 0.33333f,
-//                        target.y,
-//                        target.width * 0.333333f,
-//                        target.height * (elapsed / length).coerceAtMost(1.0).toFloat(),
-//                        color = Color.GREEN.toFloatBits(),
-//                    )
-//
-//                Direction.LEFT ->
-//                    shapeRenderer.filledRectangle(
-//                        target.x + target.width,
-//                        target.y + target.height * 0.33333f,
-//                        -target.width * (elapsed / length).coerceAtMost(1.0).toFloat(),
-//                        target.height * 0.333333f,
-//                        color = Color.GREEN.toFloatBits(),
-//                    )
-//
-//                Direction.RIGHT ->
-//                    shapeRenderer.filledRectangle(
-//                        target.x,
-//                        target.y + target.height * 0.33333f,
-//                        target.width * (elapsed / length).coerceAtMost(1.0).toFloat(),
-//                        target.height * 0.333333f,
-//                        color = Color.GREEN.toFloatBits(),
-//                    )
-//
-//                null -> TODO()
-//            }
+
+            val elapsedRatio = (elapsed / length).coerceAtMost(0.9999)
+            val frame = (liquidView.totalFrames * elapsedRatio).toInt()
+            liquidView.setFrame(frame)
 
             if (!filled && liquidDirection != null && elapsed > length) {
                 filled = true
@@ -108,6 +99,14 @@ class StraightPipe(
         liquidDirection != null -> false
         direction in orientation.directions -> {
             liquidDirection = direction
+            liquidView.rotation(
+                when (direction) {
+                    Direction.UP -> Angle.ZERO
+                    Direction.DOWN -> Angle.HALF
+                    Direction.LEFT -> Angle.THREE_QUARTERS
+                    Direction.RIGHT -> Angle.QUARTER
+                },
+            )
             true
         }
 

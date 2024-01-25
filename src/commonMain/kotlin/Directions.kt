@@ -36,6 +36,22 @@ enum class Direction(
             LEFT -> RIGHT
             RIGHT -> LEFT
         }
+
+    fun nextClockwise() =
+        when (this) {
+            UP -> RIGHT
+            RIGHT -> DOWN
+            DOWN -> LEFT
+            LEFT -> UP
+        }
+
+    fun angle() =
+        when (this) {
+            UP -> Angle.ZERO
+            RIGHT -> Angle.QUARTER
+            DOWN -> Angle.HALF
+            LEFT -> Angle.THREE_QUARTERS
+        }
 }
 
 enum class Rotation(

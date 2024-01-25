@@ -6,6 +6,7 @@ import korlibs.korge.view.position
 import korlibs.korge.view.size
 import korlibs.math.geom.Rectangle
 import korlibs.math.geom.Vector2I
+import tile.CornerPipe
 import tile.EmptyTile
 import tile.Overflow
 import tile.StraightPipe
@@ -28,6 +29,10 @@ class StagingField() {
         listOf(
             { StraightPipe(2.seconds, Orientation.VERTICAL) },
             { StraightPipe(2.seconds, Orientation.HORIZONTAL) },
+            { CornerPipe(2.seconds, Direction.UP) },
+            { CornerPipe(2.seconds, Direction.DOWN) },
+            { CornerPipe(2.seconds, Direction.LEFT) },
+            { CornerPipe(2.seconds, Direction.RIGHT) },
         )
 
     fun retrieve(): Tile {
@@ -39,18 +44,19 @@ class StagingField() {
         return ret
     }
 
-    fun repositionTiles() = fifo.forEachIndexed { y, tile ->
-        tile.bindView(
-            getRect(y),
-            assets,
-            sContainer,
-        )
-    }
+    fun repositionTiles() =
+        fifo.forEachIndexed { y, tile ->
+            tile.bindView(
+                getRect(y),
+                assets,
+                sContainer,
+            )
+        }
 
     fun replenish() {
         (fifo.size..<count).forEach { _ ->
             fifo.add(
-                generators.random()()
+                generators.random()(),
             )
         }
         repositionTiles()
@@ -146,7 +152,10 @@ class PlayField(
         tileHeight,
     )
 
-    fun onTouchUp(pos: Vector2I, stagingField: StagingField) {
+    fun onTouchUp(
+        pos: Vector2I,
+        stagingField: StagingField,
+    ) {
         if (!rect.contains(pos)) {
             return
         }
@@ -172,9 +181,19 @@ data class Assets(val atlas: Atlas) {
     val straightH = atlas["straightH"]
     val straightV = atlas["straightV"]
     val cornerFluid =
-        (1..8).map {
-            atlas["corner-fluid$it"]
-        }
+        SpriteAnimation(
+            listOf(transparent) +
+                (1..8).map {
+                    atlas["corner-fluid$it"]
+                },
+        )
+    val cornerFluidFlipped =
+        SpriteAnimation(
+            listOf(transparent) +
+                (1..8).map {
+                    atlas["corner-fluid-flip$it"]
+                },
+        )
     val straightFluid =
         SpriteAnimation(
             listOf(transparent) +

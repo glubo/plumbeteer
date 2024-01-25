@@ -2,7 +2,6 @@ package tile
 
 import Assets
 import Direction
-import Orientation
 import korlibs.korge.view.SContainer
 import korlibs.korge.view.Sprite
 import korlibs.korge.view.centered
@@ -11,19 +10,21 @@ import korlibs.korge.view.position
 import korlibs.korge.view.rotation
 import korlibs.korge.view.size
 import korlibs.korge.view.sprite
-import korlibs.math.geom.Angle
 import korlibs.math.geom.Rectangle
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-class StraightPipe(
+class CornerPipe(
     val length: Duration,
-    val orientation: Orientation,
+    val direction: Direction,
 ) : Tile() {
     var elapsed = 0.seconds
     var liquidDirection: Direction? = null
     var filled = false
     lateinit var liquidView: Sprite
+    lateinit var assets: Assets
+    lateinit var sContainer: SContainer
+    lateinit var target: Rectangle
 
     override fun bindView(
         target: Rectangle,
@@ -42,7 +43,7 @@ class StraightPipe(
         )
         views.add(
             sContainer.image(
-                assets.straightV,
+                assets.corner,
             ) {
                 position(target.centerX, target.centerY)
                 centered
@@ -50,9 +51,24 @@ class StraightPipe(
                 rotation(angle())
             },
         )
-        liquidView =
+
+        liquidView = if (direction == liquidDirection) {
+            println("yes")
+
+                sContainer.sprite(
+                    assets.cornerFluidFlipped,
+                ) {
+                    position(target.centerX, target.centerY)
+                    centered
+                    size(target.size)
+                    setFrame(0)
+                    rotation(angle())
+                }
+        } else {
+            println("no")
+
             sContainer.sprite(
-                assets.straightFluid,
+                assets.cornerFluid,
             ) {
                 position(target.centerX, target.centerY)
                 centered
@@ -60,16 +76,17 @@ class StraightPipe(
                 setFrame(0)
                 rotation(angle())
             }
+        }
         views.add(
             liquidView,
         )
+
+        this.assets = assets
+        this.sContainer = sContainer
+        this.target = target
     }
 
-    private fun angle() =
-        when (orientation) {
-            Orientation.VERTICAL -> Angle.ZERO
-            Orientation.HORIZONTAL -> Angle.QUARTER
-        }
+    private fun angle() = direction.angle()
 
     override fun onUpdate(dt: Duration): TileEvent? {
         if (liquidDirection != null) {
@@ -83,9 +100,11 @@ class StraightPipe(
 
             if (!filled && liquidDirection != null && elapsed > length) {
                 filled = true
+                val outputDirection = validDirections().first { it != liquidDirection }
+
                 return Overflow(
                     elapsed - length,
-                    liquidDirection!!,
+                    outputDirection,
                 )
             }
         }
@@ -97,15 +116,11 @@ class StraightPipe(
         dt: Duration,
     ) = when {
         liquidDirection != null -> false
-        direction in orientation.directions -> {
-            liquidDirection = direction
-            liquidView.rotation(
-                when (direction) {
-                    Direction.UP -> Angle.ZERO
-                    Direction.DOWN -> Angle.HALF
-                    Direction.LEFT -> Angle.THREE_QUARTERS
-                    Direction.RIGHT -> Angle.QUARTER
-                },
+        direction.opposite() in validDirections() -> {
+            println(validDirections())
+            liquidDirection = direction.opposite()
+            bindView(
+                target, assets, sContainer
             )
             true
         }
@@ -113,5 +128,10 @@ class StraightPipe(
         else -> false
     }
 
+    private fun validDirections() = listOf(direction, direction.nextClockwise())
+
     override fun isEditable() = liquidDirection == null
+    override fun toString(): String {
+        return "CornerPipe(direction=$direction, elapsed=$elapsed, liquidDirection=$liquidDirection)"
+    }
 }

@@ -40,14 +40,15 @@ class MyScene : Scene() {
                 assets,
             )
 
-        val staging = StagingField().also {
-            it.bindView(
-                this,
-                assets,
-                Rectangle(450, 0, 40, 200),
-            )
-            it.replenish()
-        }
+        val staging =
+            StagingField().also {
+                it.bindView(
+                    this,
+                    assets,
+                    Rectangle(450, 0, 40, 200),
+                )
+                it.replenish()
+            }
 
         addUpdater { dt ->
             startTimer = (startTimer - dt).coerceAtLeast(0.seconds)

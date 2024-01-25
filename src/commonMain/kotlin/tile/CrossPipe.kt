@@ -3,6 +3,8 @@ package tile
 import Assets
 import Direction
 import Orientation
+import Orientation.HORIZONTAL
+import Orientation.VERTICAL
 import korlibs.korge.view.SContainer
 import korlibs.korge.view.Sprite
 import korlibs.korge.view.centered
@@ -18,12 +20,60 @@ import kotlin.time.Duration.Companion.seconds
 
 class CrossPipe(
     val length: Duration,
-    val orientation: Orientation,
 ) : Tile() {
-    var elapsed = 0.seconds
-    var liquidDirection: Direction? = null
-    var filled = false
-    lateinit var liquidView: Sprite
+    class Inner(
+        val length: Duration,
+        val orientation: Orientation,
+    ) {
+        var elapsed = 0.seconds
+        var liquidDirection: Direction? = null
+        var filled = false
+        lateinit var liquidView: Sprite
+        fun angle() =
+            liquidDirection?.angle() ?: Angle.ZERO
+
+        fun onUpdate(dt: Duration): TileEvent? {
+            if (liquidDirection != null) {
+                if (!filled) {
+                    elapsed += dt
+                }
+
+                val elapsedRatio = (elapsed / length).coerceAtMost(0.9999)
+                val frame = ((liquidView.totalFrames - 1) * elapsedRatio).toInt()
+                liquidView.setFrame(1 + frame)
+
+                if (!filled && liquidDirection != null && elapsed > length) {
+                    filled = true
+                    return Overflow(
+                        elapsed - length,
+                        liquidDirection!!,
+                    )
+                }
+            }
+            return null
+        }
+
+        fun takeLiquid(
+            direction: Direction,
+            dt: Duration,
+        ) = when {
+            liquidDirection != null -> false
+            direction in orientation.directions -> {
+                liquidDirection = direction
+                liquidView.rotation(
+                    direction.angle()
+                )
+                true
+            }
+
+            else -> false
+        }
+    }
+
+    val innerMap = mapOf(
+        VERTICAL to Inner(length, VERTICAL),
+        HORIZONTAL to Inner(length, HORIZONTAL)
+    )
 
     override fun bindView(
         target: Rectangle,
@@ -42,76 +92,44 @@ class CrossPipe(
         )
         views.add(
             sContainer.image(
-                assets.straightV,
+                assets.cross,
             ) {
                 position(target.centerX, target.centerY)
                 centered
                 size(target.size)
-                rotation(angle())
             },
         )
-        liquidView =
-            sContainer.sprite(
-                assets.straightFluid,
-            ) {
-                position(target.centerX, target.centerY)
-                centered
-                size(target.size)
-                setFrame(0)
-                rotation(angle())
-            }
-        views.add(
-            liquidView,
-        )
+        innerMap.forEach {
+            it.value.liquidView =
+                sContainer.sprite(
+                    assets.straightFluid,
+                ) {
+                    position(target.centerX, target.centerY)
+                    centered
+                    size(target.size)
+                    setFrame(0)
+                    rotation(it.value.angle())
+                }
+            views.add(
+                it.value.liquidView,
+            )
+        }
     }
 
-    private fun angle() =
-        when (orientation) {
-            Orientation.VERTICAL -> Angle.ZERO
-            Orientation.HORIZONTAL -> Angle.QUARTER
-        }
-
     override fun onUpdate(dt: Duration): TileEvent? {
-        if (liquidDirection != null) {
-            if (!filled) {
-                elapsed += dt
-            }
-
-            val elapsedRatio = (elapsed / length).coerceAtMost(0.9999)
-            val frame = ((liquidView.totalFrames - 1) * elapsedRatio).toInt()
-            liquidView.setFrame(1 + frame)
-
-            if (!filled && liquidDirection != null && elapsed > length) {
-                filled = true
-                return Overflow(
-                    elapsed - length,
-                    liquidDirection!!,
-                )
-            }
+        var ret: TileEvent? = null
+        innerMap.forEach {
+            ret = it.value.onUpdate(dt) ?: ret
         }
-        return null
+        return ret
     }
 
     override fun takeLiquid(
         direction: Direction,
         dt: Duration,
-    ) = when {
-        liquidDirection != null -> false
-        direction in orientation.directions -> {
-            liquidDirection = direction
-            liquidView.rotation(
-                when (direction) {
-                    Direction.UP -> Angle.ZERO
-                    Direction.DOWN -> Angle.HALF
-                    Direction.LEFT -> Angle.THREE_QUARTERS
-                    Direction.RIGHT -> Angle.QUARTER
-                },
-            )
-            true
-        }
-
-        else -> false
+    ) = innerMap.any {
+        it.value.takeLiquid(direction, dt)
     }
 
-    override fun isEditable() = liquidDirection == null
+    override fun isEditable() = innerMap.values.none { it.liquidDirection != null }
 }

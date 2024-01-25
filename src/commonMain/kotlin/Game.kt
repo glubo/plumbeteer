@@ -7,6 +7,7 @@ import korlibs.korge.view.size
 import korlibs.math.geom.Rectangle
 import korlibs.math.geom.Vector2I
 import tile.CornerPipe
+import tile.CrossPipe
 import tile.EmptyTile
 import tile.Overflow
 import tile.StraightPipe
@@ -33,6 +34,7 @@ class StagingField() {
             { CornerPipe(2.seconds, Direction.DOWN) },
             { CornerPipe(2.seconds, Direction.LEFT) },
             { CornerPipe(2.seconds, Direction.RIGHT) },
+            { CrossPipe(2.seconds) },
         )
 
     fun retrieve(): Tile {
@@ -178,6 +180,7 @@ data class Assets(val atlas: Atlas) {
     val transparent = atlas["transparent"]
     val empty = atlas["empty"]
     val corner = atlas["corner"]
+    val cross = atlas["cross"]
     val straightH = atlas["straightH"]
     val straightV = atlas["straightV"]
     val cornerFluid =

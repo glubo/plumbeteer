@@ -24,7 +24,7 @@ suspend fun main() =
 
 class MyScene : Scene() {
     override suspend fun SContainer.sceneMain() {
-        val atlas = resourcesVfs["texture.json"].readAtlas()
+        val atlas = resourcesVfs["texture1.json"].readAtlas()
         val startDuration = 4.seconds
         var startTimer = startDuration
         var started = false

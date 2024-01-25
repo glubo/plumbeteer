@@ -30,14 +30,24 @@ class MyScene : Scene() {
         var started = false
         var gameOver = false
 
+        val assets = Assets(atlas)
         val field =
             PlayField(
                 Rectangle(0, 0, 400, 400),
                 xtiles = 10,
                 ytiles = 10,
                 this,
-                Assets(atlas),
+                assets,
             )
+
+        val staging = StagingField().also {
+            it.bindView(
+                this,
+                assets,
+                Rectangle(450, 0, 40, 200),
+            )
+            it.replenish()
+        }
 
         addUpdater { dt ->
             startTimer = (startTimer - dt).coerceAtLeast(0.seconds)
@@ -68,7 +78,7 @@ class MyScene : Scene() {
 
         this.mouse {
             onClick {
-                field.onTouchUp(it.currentPosLocal.toInt())
+                field.onTouchUp(it.currentPosLocal.toInt(), staging)
             }
         }
     }

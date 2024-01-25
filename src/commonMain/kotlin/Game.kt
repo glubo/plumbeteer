@@ -17,6 +17,64 @@ sealed interface FieldEvent
 
 class GameOver : FieldEvent
 
+class StagingField() {
+    val fifo = mutableListOf<Tile>()
+    val count = 5
+    lateinit var sContainer: SContainer
+    lateinit var assets: Assets
+    lateinit var rect: Rectangle
+
+    val generators =
+        listOf(
+            { StraightPipe(2.seconds, Orientation.VERTICAL) },
+            { StraightPipe(2.seconds, Orientation.HORIZONTAL) },
+        )
+
+    fun retrieve(): Tile {
+        val ret = fifo.removeFirst()
+        println("$fifo $ret")
+        ret.release()
+        replenish()
+        println("$fifo")
+        return ret
+    }
+
+    fun repositionTiles() = fifo.forEachIndexed { y, tile ->
+        tile.bindView(
+            getRect(y),
+            assets,
+            sContainer,
+        )
+    }
+
+    fun replenish() {
+        (fifo.size..<count).forEach { _ ->
+            fifo.add(
+                generators.random()()
+            )
+        }
+        repositionTiles()
+    }
+
+    private fun getRect(y: Int) =
+        Rectangle(
+            rect.x,
+            rect.y + y.toDouble() * rect.height / count,
+            rect.width,
+            rect.height / count,
+        )
+
+    fun bindView(
+        sContainer: SContainer,
+        assets: Assets,
+        rect: Rectangle,
+    ) {
+        this.sContainer = sContainer
+        this.assets = assets
+        this.rect = rect
+    }
+}
+
 class PlayField(
     val rect: Rectangle,
     xtiles: Int,
@@ -88,7 +146,7 @@ class PlayField(
         tileHeight,
     )
 
-    fun onTouchUp(pos: Vector2I) {
+    fun onTouchUp(pos: Vector2I, stagingField: StagingField) {
         if (!rect.contains(pos)) {
             return
         }
@@ -99,7 +157,7 @@ class PlayField(
             if (currentTile.isEditable()) {
                 currentTile.release()
                 tiles[x][y] =
-                    StraightPipe(2.seconds, Orientation.entries.random()).also {
+                    stagingField.retrieve().also {
                         it.bindView(getTileRect(x, y), assets, sContainer)
                     }
             }

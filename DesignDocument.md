@@ -76,12 +76,11 @@ Easy to understand game mechanics and fast game loop this should be a great game
 
 # Design
 
-TBD
+I will aim for a simple pixel art resembling similar style to original game.
+
+![screenshot](screenshot.png)
 
 # Audio
 
-TBD
+I will probably won't be able to audio in time, but in the future I will probably add some midi music and retro sound effects.
 
-# Game Experience
-
-TBD

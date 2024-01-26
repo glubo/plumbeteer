@@ -47,6 +47,7 @@ class CrossPipe(
                     return Overflow(
                         elapsed - length,
                         liquidDirection!!,
+                        1000,
                     )
                 }
             }
@@ -121,7 +122,16 @@ class CrossPipe(
         innerMap.forEach {
             ret = it.value.onUpdate(dt) ?: ret
         }
-        return ret
+        return when {
+            ret is Overflow && innerMap.all { it.value.filled } -> {
+                Overflow(
+                    (ret as Overflow).dt,
+                    (ret as Overflow).direction,
+                    5000L
+                )
+            }
+            else -> ret
+        }
     }
 
     override fun takeLiquid(

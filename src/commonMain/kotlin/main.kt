@@ -54,6 +54,9 @@ class MyScene : Scene() {
                 )
                 it.replenish()
             }
+        val scoreView = text("SCORE: 0", textSize = 24) {
+            position(10, 410)
+        }
         var gameOverView: View? = null
         val startTimerView = solidRect(
             30, 200,
@@ -68,6 +71,7 @@ class MyScene : Scene() {
                 is GameOver -> gameOver = true
                 null -> {}
             }
+            scoreView.text = "SCORE: ${field.score}"
             if (!started && startTimer == 0.seconds) {
                 started = true
                 field.start()

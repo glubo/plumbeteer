@@ -36,6 +36,7 @@ sealed interface TileEvent
 data class Overflow(
     val dt: Duration,
     val direction: Direction,
+    val score: Long,
 ) : TileEvent {
     init {
         println(this)

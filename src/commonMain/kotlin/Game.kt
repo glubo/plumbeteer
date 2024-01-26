@@ -1,6 +1,7 @@
 import korlibs.image.atlas.Atlas
 import korlibs.korge.view.SContainer
 import korlibs.korge.view.SpriteAnimation
+import korlibs.korge.view.Text
 import korlibs.korge.view.image
 import korlibs.korge.view.position
 import korlibs.korge.view.size
@@ -101,6 +102,7 @@ class PlayField(
         }
     val startX = (1..<xtiles - 1).random()
     val startY = (1..<ytiles - 1).random()
+    var score = 0L
 
     init {
         sContainer.image(assets.straightH) {
@@ -131,6 +133,7 @@ class PlayField(
 
                 when (event) {
                     is Overflow -> {
+                        score += event.score
                         val pos = event.direction.vec + Vec2i(x, y)
                         val newTile = getTileOrNull(pos)
                         if (newTile == null) {

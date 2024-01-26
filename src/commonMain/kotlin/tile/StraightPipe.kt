@@ -86,6 +86,7 @@ class StraightPipe(
                 return Overflow(
                     elapsed - length,
                     liquidDirection!!,
+                    1000L
                 )
             }
         }

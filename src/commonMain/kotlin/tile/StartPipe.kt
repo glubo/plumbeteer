@@ -90,6 +90,7 @@ class StartPipe(
                 return Overflow(
                     elapsed - length,
                     direction,
+                    0L
                 )
             }
         }

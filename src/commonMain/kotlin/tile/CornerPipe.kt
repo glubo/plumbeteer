@@ -103,6 +103,7 @@ class CornerPipe(
                 return Overflow(
                     elapsed - length,
                     outputDirection,
+                    1000
                 )
             }
         }

@@ -2,16 +2,24 @@ import korlibs.image.atlas.readAtlas
 import korlibs.image.color.Colors
 import korlibs.image.format.PNG
 import korlibs.image.format.RegisteredImageFormats
+import korlibs.image.paint.Paint
+import korlibs.image.paint.withPaint
 import korlibs.io.file.std.resourcesVfs
 import korlibs.korge.Korge
 import korlibs.korge.input.mouse
 import korlibs.korge.scene.Scene
 import korlibs.korge.scene.sceneContainer
 import korlibs.korge.view.SContainer
+import korlibs.korge.view.View
 import korlibs.korge.view.addUpdater
+import korlibs.korge.view.align.centerOnStage
+import korlibs.korge.view.position
+import korlibs.korge.view.solidRect
+import korlibs.korge.view.text
 import korlibs.math.geom.Rectangle
 import korlibs.math.geom.Size
 import korlibs.math.geom.toInt
+import korlibs.math.geom.vector.StrokeInfo
 import kotlin.time.Duration.Companion.seconds
 
 suspend fun main() =
@@ -49,11 +57,19 @@ class MyScene : Scene() {
                 )
                 it.replenish()
             }
+        var gameOverView: View? = null
+        val startTimerView = solidRect(
+            30, 200,
+            Colors.GREEN
+        ) {
+            position(410, 0)
+        }
 
         addUpdater { dt ->
             startTimer = (startTimer - dt).coerceAtLeast(0.seconds)
 
             val timerLeft = startTimer / startDuration
+            startTimerView.height = 200*timerLeft
             val event = field.onUpdate(dt)
             when (event) {
                 is GameOver -> gameOver = true
@@ -62,24 +78,26 @@ class MyScene : Scene() {
             if (!started && startTimer == 0.seconds) {
                 field.tiles.first().first().takeLiquid(Direction.RIGHT, dt)
             }
+
+            if (gameOver && gameOverView == null) {
+                gameOverView = text("GAME OVER", textSize = 68, color = Colors.BLACK, ) {
+                    centerOnStage()
+                }
+                gameOverView = text("GAME OVER", textSize = 66, color = Colors.WHITE, ) {
+                    centerOnStage()
+                }
+                gameOverView = text("GAME OVER", textSize = 64, color = Colors.RED, ) {
+                    centerOnStage()
+                }
+            }
         }
-//
-//    onRender { dt ->
-//
-//
-//
-//
-//
-//            if (gameOver) {
-//                Fonts.default.draw(it, "Game Over!", -15f, 0f)
-//            }
-//        }
-//    }
-// }
+
 
         this.mouse {
             onClick {
-                field.onTouchUp(it.currentPosLocal.toInt(), staging)
+                if (!gameOver) {
+                    field.onTouchUp(it.currentPosLocal.toInt(), staging)
+                }
             }
         }
     }

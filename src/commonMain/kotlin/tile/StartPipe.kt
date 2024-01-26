@@ -14,7 +14,7 @@ import korlibs.math.geom.Rectangle
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-class CornerPipe(
+class StartPipe(
     val length: Duration,
     val direction: Direction,
 ) : Tile() {
@@ -43,7 +43,7 @@ class CornerPipe(
         )
         views.add(
             sContainer.image(
-                assets.corner,
+                assets.start,
             ) {
                 position(target.centerX, target.centerY)
                 centered
@@ -52,28 +52,15 @@ class CornerPipe(
             },
         )
 
-        liquidView = if (direction == liquidDirection) {
 
-                sContainer.sprite(
-                    assets.cornerFluidFlipped,
-                ) {
-                    position(target.centerX, target.centerY)
-                    centered
-                    size(target.size)
-                    setFrame(0)
-                    rotation(angle())
-                }
-        } else {
-
-            sContainer.sprite(
-                assets.cornerFluid,
-            ) {
-                position(target.centerX, target.centerY)
-                centered
-                size(target.size)
-                setFrame(0)
-                rotation(angle())
-            }
+        liquidView = sContainer.sprite(
+            assets.startFluid,
+        ) {
+            position(target.centerX, target.centerY)
+            centered
+            size(target.size)
+            setFrame(0)
+            rotation(angle())
         }
         views.add(
             liquidView,
@@ -84,11 +71,12 @@ class CornerPipe(
         this.target = target
     }
 
-    private fun angle() = direction.angle()
+    private fun angle() = direction.nextClockwise().angle()
 
     override fun onUpdate(dt: Duration): TileEvent? {
         if (liquidDirection != null) {
             if (!filled) {
+                println(this)
                 elapsed += dt
             }
 
@@ -98,11 +86,10 @@ class CornerPipe(
 
             if (!filled && liquidDirection != null && elapsed > length) {
                 filled = true
-                val outputDirection = validDirections().first { it != liquidDirection }
 
                 return Overflow(
                     elapsed - length,
-                    outputDirection,
+                    direction,
                 )
             }
         }
@@ -112,23 +99,15 @@ class CornerPipe(
     override fun takeLiquid(
         direction: Direction,
         dt: Duration,
-    ) = when {
-        liquidDirection != null -> false
-        direction.opposite() in validDirections() -> {
-            liquidDirection = direction.opposite()
-            bindView(
-                target, assets, sContainer
-            )
-            true
-        }
+    ) = false
 
-        else -> false
+
+    override fun isEditable() = false
+    override fun toString(): String {
+        return "StartPipe(direction=$direction, elapsed=$elapsed, liquidDirection=$liquidDirection)"
     }
 
-    private fun validDirections() = listOf(direction, direction.nextClockwise())
-
-    override fun isEditable() = liquidDirection == null
-    override fun toString(): String {
-        return "CornerPipe(direction=$direction, elapsed=$elapsed, liquidDirection=$liquidDirection)"
+    fun start() {
+        liquidDirection = direction
     }
 }

@@ -1,9 +1,8 @@
-# Korge Hello World and Template
+# Plumbeteer
 
-This is a Hello World and Template for the KorGe game engine. Using gradle with kotlin-dsl.
-You can open this project in IntelliJ IDEA by opening the folder or the build.gradle.kts file.
+A game with pipes and liquids made originally for Pirate Software Game Jam #14.
 
-You can find this template at GitHub: <https://github.com/korlibs/korge-hello-world>
+You can play this game on https://glubothemad.itch.io/plumbeteer
 
+You can see the [Design Document](DesignDocument.md).
 
-You can find the KorGE documentation here: <https://docs.korge.org/korge/>

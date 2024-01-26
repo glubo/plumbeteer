@@ -10,6 +10,7 @@ import tile.CornerPipe
 import tile.CrossPipe
 import tile.EmptyTile
 import tile.Overflow
+import tile.StartPipe
 import tile.StraightPipe
 import tile.Tile
 import kotlin.time.Duration
@@ -98,17 +99,25 @@ class PlayField(
                 EmptyTile()
             }.toMutableList<Tile>()
         }
+    val startX = (1..<xtiles - 1).random()
+    val startY = (1..<ytiles - 1).random()
 
     init {
         sContainer.image(assets.straightH) {
             position(rect.x, rect.y)
             size(rect.size)
         }
+
+        tiles[startX][startY] = StartPipe(2.seconds, Direction.entries.random())
         tiles.forEachIndexed { x, line ->
             line.forEachIndexed { y, tile ->
                 tile.bindView(getTileRect(x, y), assets, sContainer)
             }
         }
+    }
+
+    fun start() {
+        (tiles[startX][startY] as StartPipe).start()
     }
 
     fun onUpdate(dt: Duration): FieldEvent? {
@@ -180,9 +189,17 @@ data class Assets(val atlas: Atlas) {
     val transparent = atlas["transparent"]
     val empty = atlas["empty"]
     val corner = atlas["corner"]
+    val start = atlas["start"]
     val cross = atlas["cross"]
     val straightH = atlas["straightH"]
     val straightV = atlas["straightV"]
+    val startFluid =
+        SpriteAnimation(
+            listOf(transparent) +
+                (1..8).map {
+                    atlas["start-fluid$it"]
+                },
+        )
     val cornerFluid =
         SpriteAnimation(
             listOf(transparent) +

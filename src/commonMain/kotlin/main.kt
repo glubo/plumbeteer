@@ -2,8 +2,6 @@ import korlibs.image.atlas.readAtlas
 import korlibs.image.color.Colors
 import korlibs.image.format.PNG
 import korlibs.image.format.RegisteredImageFormats
-import korlibs.image.paint.Paint
-import korlibs.image.paint.withPaint
 import korlibs.io.file.std.resourcesVfs
 import korlibs.korge.Korge
 import korlibs.korge.input.mouse
@@ -19,7 +17,6 @@ import korlibs.korge.view.text
 import korlibs.math.geom.Rectangle
 import korlibs.math.geom.Size
 import korlibs.math.geom.toInt
-import korlibs.math.geom.vector.StrokeInfo
 import kotlin.time.Duration.Companion.seconds
 
 suspend fun main() =
@@ -32,7 +29,7 @@ suspend fun main() =
 
 class MyScene : Scene() {
     override suspend fun SContainer.sceneMain() {
-        val atlas = resourcesVfs["texture1.json"].readAtlas()
+        val atlas = resourcesVfs["texture2.json"].readAtlas()
         val startDuration = 4.seconds
         var startTimer = startDuration
         var started = false
@@ -66,27 +63,28 @@ class MyScene : Scene() {
         }
 
         addUpdater { dt ->
-            startTimer = (startTimer - dt).coerceAtLeast(0.seconds)
-
-            val timerLeft = startTimer / startDuration
-            startTimerView.height = 200*timerLeft
             val event = field.onUpdate(dt)
             when (event) {
                 is GameOver -> gameOver = true
                 null -> {}
             }
             if (!started && startTimer == 0.seconds) {
-                field.tiles.first().first().takeLiquid(Direction.RIGHT, dt)
+                started = true
+                field.start()
+            } else {
+                startTimer = (startTimer - dt).coerceAtLeast(0.seconds)
+                val timerLeft = startTimer / startDuration
+                startTimerView.height = 200 * timerLeft
             }
 
             if (gameOver && gameOverView == null) {
-                gameOverView = text("GAME OVER", textSize = 68, color = Colors.BLACK, ) {
+                gameOverView = text("GAME OVER", textSize = 68, color = Colors.BLACK) {
                     centerOnStage()
                 }
-                gameOverView = text("GAME OVER", textSize = 66, color = Colors.WHITE, ) {
+                gameOverView = text("GAME OVER", textSize = 66, color = Colors.WHITE) {
                     centerOnStage()
                 }
-                gameOverView = text("GAME OVER", textSize = 64, color = Colors.RED, ) {
+                gameOverView = text("GAME OVER", textSize = 64, color = Colors.RED) {
                     centerOnStage()
                 }
             }

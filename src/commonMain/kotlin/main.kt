@@ -12,11 +12,10 @@ import korlibs.korge.view.View
 import korlibs.korge.view.addUpdater
 import korlibs.korge.view.align.centerOnStage
 import korlibs.korge.view.position
+import korlibs.korge.view.scale
 import korlibs.korge.view.solidRect
 import korlibs.korge.view.text
-import korlibs.math.geom.Rectangle
 import korlibs.math.geom.Size
-import korlibs.math.geom.toInt
 import kotlin.time.Duration.Companion.seconds
 
 suspend fun main() =
@@ -34,36 +33,40 @@ class MyScene : Scene() {
         var startTimer = startDuration
         var started = false
         var gameOver = false
+        val aaa =
+            sceneContainer {
+                this.x = 110.0
+                this.y = 10.0
+                this.size = Size(50, 50)
+            }.scale(2.0, 1.0)
+
+        aaa.solidRect(50, 50, Colors.RED)
 
         val assets = Assets(atlas)
         val field =
             PlayField(
-                Rectangle(0, 0, 400, 400),
                 xtiles = 10,
                 ytiles = 10,
-                this,
-                assets,
+                { println("unhandled $it") },
             )
 
         val staging =
             StagingField().also {
-                it.bindView(
-                    this,
-                    assets,
-                    Rectangle(450, 0, 40, 200),
-                )
                 it.replenish()
             }
-        val scoreView = text("SCORE: 0", textSize = 24) {
-            position(10, 410)
-        }
+        val scoreView =
+            text("SCORE: 0", textSize = 24) {
+                position(10, 410)
+            }
         var gameOverView: View? = null
-        val startTimerView = solidRect(
-            30, 200,
-            Colors.GREEN
-        ) {
-            position(410, 0)
-        }
+        val startTimerView =
+            solidRect(
+                30,
+                200,
+                Colors.GREEN,
+            ) {
+                position(410, 0)
+            }
 
         addUpdater { dt ->
             val event = field.onUpdate(dt)
@@ -82,23 +85,26 @@ class MyScene : Scene() {
             }
 
             if (gameOver && gameOverView == null) {
-                gameOverView = text("GAME OVER", textSize = 68, color = Colors.BLACK) {
-                    centerOnStage()
-                }
-                gameOverView = text("GAME OVER", textSize = 66, color = Colors.WHITE) {
-                    centerOnStage()
-                }
-                gameOverView = text("GAME OVER", textSize = 64, color = Colors.RED) {
-                    centerOnStage()
-                }
+                gameOverView =
+                    text("GAME OVER", textSize = 68, color = Colors.BLACK) {
+                        centerOnStage()
+                    }
+                gameOverView =
+                    text("GAME OVER", textSize = 66, color = Colors.WHITE) {
+                        centerOnStage()
+                    }
+                gameOverView =
+                    text("GAME OVER", textSize = 64, color = Colors.RED) {
+                        centerOnStage()
+                    }
             }
         }
-
 
         this.mouse {
             onClick {
                 if (!gameOver) {
-                    field.onTouchUp(it.currentPosLocal.toInt(), staging)
+                    TODO("translate to x, y")
+                    field.onTouchUp(0, 0)
                 }
             }
         }

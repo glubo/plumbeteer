@@ -1,26 +1,9 @@
 package tile
 
-import Assets
 import Direction
-import korlibs.korge.view.SContainer
-import korlibs.korge.view.View
-import korlibs.math.geom.Rectangle
 import kotlin.time.Duration
 
-sealed class Tile() {
-    protected var views = mutableListOf<View>()
-
-    abstract fun bindView(
-        target: Rectangle,
-        assets: Assets,
-        sContainer: SContainer,
-    )
-
-    fun release() {
-        views.forEach { it.removeFromParent() }
-        views.clear()
-    }
-
+sealed class Tile {
     abstract fun onUpdate(dt: Duration): TileEvent?
 
     abstract fun takeLiquid(

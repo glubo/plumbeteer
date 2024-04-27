@@ -6,16 +6,28 @@ import korlibs.io.file.std.resourcesVfs
 import korlibs.korge.Korge
 import korlibs.korge.input.mouse
 import korlibs.korge.scene.Scene
+import korlibs.korge.scene.SceneContainer
 import korlibs.korge.scene.sceneContainer
 import korlibs.korge.view.SContainer
 import korlibs.korge.view.View
 import korlibs.korge.view.addUpdater
 import korlibs.korge.view.align.centerOnStage
+import korlibs.korge.view.centered
 import korlibs.korge.view.position
-import korlibs.korge.view.scale
+import korlibs.korge.view.rotation
+import korlibs.korge.view.size
 import korlibs.korge.view.solidRect
+import korlibs.korge.view.sprite
 import korlibs.korge.view.text
+import korlibs.math.geom.Rectangle
 import korlibs.math.geom.Size
+import korlibs.math.geom.Vector2
+import korlibs.time.TimeSpan
+import tile.CornerPipe
+import tile.CrossPipe
+import tile.EmptyTile
+import tile.StartPipe
+import tile.StraightPipe
 import kotlin.time.Duration.Companion.seconds
 
 suspend fun main() =
@@ -23,44 +35,148 @@ suspend fun main() =
         val sceneContainer = sceneContainer()
 
         RegisteredImageFormats.register(PNG)
-        sceneContainer.changeTo({ MyScene() })
+        sceneContainer.changeTo { MyScene() }
     }
+
+class StagingAreaView(
+    val stagingArea: StagingArea,
+    val assets: Assets,
+    val sContainer: SceneContainer,
+    val viewRectangle: Rectangle,
+) {
+    val views = mutableListOf<View>()
+    val tileSize =
+        Size(
+            viewRectangle.width,
+            viewRectangle.height / stagingArea.count,
+        )
+
+    fun update(dt: TimeSpan) {
+        views.forEach { it.removeFromParent() }
+        views.clear()
+
+        stagingArea.fifo.forEachIndexed { y, tile ->
+            val tilePos =
+                Vector2(
+                    viewRectangle.x,
+                    viewRectangle.y + y * tileSize.height,
+                )
+            val tileRect =
+                Rectangle(
+                    tilePos.x,
+                    tilePos.y,
+                    tileSize.width,
+                    tileSize.height,
+                )
+
+            views.add(
+                sContainer.sprite(assets.empty) {
+                    position(tilePos.x, tilePos.y)
+                    size(tileSize)
+                },
+            )
+
+            when (tile) {
+                is EmptyTile -> null
+                is CornerPipe -> sContainer.baseCornerPipe(assets, tileRect, tile)
+                is CrossPipe -> sContainer.baseCrossPipe(assets, tileRect, tile)
+                is StartPipe -> null
+                is StraightPipe -> sContainer.baseStraigthPipe(assets, tileRect, tile)
+            }?.let {
+                views.add(it)
+            }
+        }
+    }
+}
+
+fun SceneContainer.baseCornerPipe(
+    assets: Assets,
+    tileRect: Rectangle,
+    tile: CornerPipe,
+) = this.sprite(
+    assets.corner,
+) {
+    position(tileRect.centerX, tileRect.centerY)
+    centered
+    size(tileRect.size)
+    rotation(tile.direction.angle())
+}
+
+fun SceneContainer.baseStraigthPipe(
+    assets: Assets,
+    tileRect: Rectangle,
+    tile: StraightPipe,
+) = this.sprite(
+    assets.straightV,
+) {
+    position(tileRect.centerX, tileRect.centerY)
+    centered
+    size(tileRect.size)
+    rotation(tile.orientation.directions.first().angle())
+}
+
+fun SceneContainer.baseCrossPipe(
+    assets: Assets,
+    tileRect: Rectangle,
+    tile: CrossPipe,
+) = this.sprite(
+    assets.cross,
+) {
+    position(tileRect.centerX, tileRect.centerY)
+    centered
+    size(tileRect.size)
+}
 
 class MyScene : Scene() {
     override suspend fun SContainer.sceneMain() {
-        val atlas = resourcesVfs["texture2.json"].readAtlas()
+        val atlas = resourcesVfs["texture3.json"].readAtlas()
         val startDuration = 4.seconds
         var startTimer = startDuration
         var started = false
         var gameOver = false
-        val aaa =
-            sceneContainer {
-                this.x = 110.0
-                this.y = 10.0
-                this.size = Size(50, 50)
-            }.scale(2.0, 1.0)
 
-        aaa.solidRect(50, 50, Colors.RED)
+        val fieldLayer = sceneContainer()
+        val topLayer = sceneContainer()
 
         val assets = Assets(atlas)
+        val staging =
+            StagingArea().also {
+                it.replenish()
+            }
         val field =
             PlayField(
                 xtiles = 10,
                 ytiles = 10,
-                { println("unhandled $it") },
+                staging,
+            ) { println("unhandled $it") }
+
+        val stagingView =
+            StagingAreaView(
+                staging,
+                assets,
+                fieldLayer,
+                Rectangle(450, 0, 40, 200),
+            )
+        val fieldView =
+            PlayFieldView(
+                field,
+                assets,
+                fieldLayer,
+                Rectangle(
+                    0,
+                    0,
+                    400,
+                    400,
+                ),
             )
 
-        val staging =
-            StagingField().also {
-                it.replenish()
-            }
         val scoreView =
             text("SCORE: 0", textSize = 24) {
                 position(10, 410)
             }
         var gameOverView: View? = null
         val startTimerView =
-            solidRect(
+            topLayer.solidRect(
                 30,
                 200,
                 Colors.GREEN,
@@ -74,6 +190,8 @@ class MyScene : Scene() {
                 is GameOver -> gameOver = true
                 null -> {}
             }
+            fieldView.update(dt)
+            stagingView.update(dt)
             scoreView.text = "SCORE: ${field.score}"
             if (!started && startTimer == 0.seconds) {
                 started = true
@@ -86,15 +204,15 @@ class MyScene : Scene() {
 
             if (gameOver && gameOverView == null) {
                 gameOverView =
-                    text("GAME OVER", textSize = 68, color = Colors.BLACK) {
+                    topLayer.text("GAME OVER", textSize = 68, color = Colors.BLACK) {
                         centerOnStage()
                     }
                 gameOverView =
-                    text("GAME OVER", textSize = 66, color = Colors.WHITE) {
+                    topLayer.text("GAME OVER", textSize = 66, color = Colors.WHITE) {
                         centerOnStage()
                     }
                 gameOverView =
-                    text("GAME OVER", textSize = 64, color = Colors.RED) {
+                    topLayer.text("GAME OVER", textSize = 64, color = Colors.RED) {
                         centerOnStage()
                     }
             }
@@ -103,8 +221,7 @@ class MyScene : Scene() {
         this.mouse {
             onClick {
                 if (!gameOver) {
-                    TODO("translate to x, y")
-                    field.onTouchUp(0, 0)
+                    fieldView.onClick(it)
                 }
             }
         }

@@ -11,6 +11,7 @@ import kotlin.time.Duration.Companion.seconds
 sealed interface FieldEvent
 
 class GameOver : FieldEvent
+
 class Scored(
     x: Int,
     y: Int,
@@ -23,7 +24,7 @@ class Placed(
     tile: Tile,
 ) : FieldEvent
 
-class StagingField {
+class StagingArea {
     val fifo = mutableListOf<Tile>()
     val count = 5
 
@@ -56,8 +57,9 @@ class StagingField {
 }
 
 class PlayField(
-    xtiles: Int,
-    ytiles: Int,
+    val xtiles: Int,
+    val ytiles: Int,
+    val stagingArea: StagingArea,
     private val eventCallback: (FieldEvent) -> Unit,
 ) {
     val tiles =
@@ -69,7 +71,6 @@ class PlayField(
     val startX = (1..<xtiles - 1).random()
     val startY = (1..<ytiles - 1).random()
     var score = 0L
-    val stagingField = StagingField()
 
     init {
         tiles[startX][startY] = StartPipe(2.seconds, Direction.entries.random())
@@ -122,10 +123,9 @@ class PlayField(
     ) {
         val currentTile = tiles[x][y]
         if (currentTile.isEditable()) {
-            val tile = stagingField.retrieve()
+            val tile = stagingArea.retrieve()
             tiles[x][y] = tile
             eventCallback(Placed(x, y, tile))
         }
     }
 }
-

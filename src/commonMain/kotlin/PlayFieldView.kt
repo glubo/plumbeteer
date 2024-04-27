@@ -8,6 +8,7 @@ import korlibs.korge.view.rotation
 import korlibs.korge.view.size
 import korlibs.korge.view.sprite
 import korlibs.logger.Logger
+import korlibs.math.geom.Angle
 import korlibs.math.geom.Rectangle
 import korlibs.math.geom.Size
 import korlibs.math.geom.Vector2
@@ -65,18 +66,88 @@ class PlayFieldView(
                     }
 
                     is CrossPipe -> {
-
+                        crossPipe(tile, tileRect)
                     }
                     is StartPipe -> {
                         startPipe(tile, tileRect)
                     }
 
                     is StraightPipe -> {
-
+                        straightPipe(tile, tileRect)
                     }
                 }
             }
         }
+    }
+
+    private fun crossPipe(
+        tile: CrossPipe,
+        tileRect: Rectangle,
+    ) {
+        views.add(
+            sContainer.sprite(
+                assets.cross,
+            ) {
+                position(tileRect.centerX, tileRect.centerY)
+                centered
+                size(tileSize)
+            },
+        )
+
+        tile.innerMap.forEach { innerEntry ->
+            val innerTile = innerEntry.value
+            val liquidView =
+                sContainer.sprite(
+                    assets.straightFluid,
+                ) {
+                    position(tileRect.centerX, tileRect.centerY)
+                    centered
+                    size(tileSize)
+                    rotation(innerTile.liquidDirection?.angle() ?: Angle.ZERO)
+                    updateLiquidFrame(
+                        innerTile.liquidDirection != null,
+                        innerTile.elapsed,
+                        innerTile.length,
+                    )
+                }
+            views.add(
+                liquidView,
+            )
+        }
+    }
+
+    private fun straightPipe(
+        tile: StraightPipe,
+        tileRect: Rectangle,
+    ) {
+        views.add(
+            sContainer.sprite(
+                assets.straightV,
+            ) {
+                position(tileRect.centerX, tileRect.centerY)
+                centered
+                size(tileSize)
+                rotation(tile.orientation.directions.first().angle())
+            },
+        )
+
+        val liquidView =
+            sContainer.sprite(
+                assets.straightFluid,
+            ) {
+                position(tileRect.centerX, tileRect.centerY)
+                centered
+                size(tileSize)
+                rotation(tile.liquidDirection?.angle() ?: Angle.ZERO)
+                updateLiquidFrame(
+                    tile.liquidDirection != null,
+                    tile.elapsed,
+                    tile.length,
+                )
+            }
+        views.add(
+            liquidView,
+        )
     }
 
     private fun startPipe(

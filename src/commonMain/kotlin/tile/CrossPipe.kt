@@ -50,10 +50,11 @@ class CrossPipe(
         }
     }
 
-    val innerMap = mapOf(
-        VERTICAL to Inner(length, VERTICAL),
-        HORIZONTAL to Inner(length, HORIZONTAL)
-    )
+    val innerMap =
+        mapOf(
+            VERTICAL to Inner(length, VERTICAL),
+            HORIZONTAL to Inner(length, HORIZONTAL),
+        )
 
     override fun onUpdate(dt: Duration): TileEvent? {
         var ret: TileEvent? = null
@@ -65,7 +66,7 @@ class CrossPipe(
                 Overflow(
                     (ret as Overflow).dt,
                     (ret as Overflow).direction,
-                    5000L
+                    5000L,
                 )
             }
 

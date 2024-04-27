@@ -12,29 +12,29 @@ data class Assets(val atlas: Atlas) {
     val startFluid =
         SpriteAnimation(
             listOf(transparent) +
-                    (1..8).map {
-                        atlas["start-fluid$it"]
-                    },
+                (1..8).map {
+                    atlas["start-fluid$it"]
+                },
         )
     val cornerFluid =
         SpriteAnimation(
             listOf(transparent) +
-                    (1..8).map {
-                        atlas["corner-fluid$it"]
-                    },
+                (1..8).map {
+                    atlas["corner-fluid$it"]
+                },
         )
     val cornerFluidFlipped =
         SpriteAnimation(
             listOf(transparent) +
-                    (1..8).map {
-                        atlas["corner-fluid-flip$it"]
-                    },
+                (1..8).map {
+                    atlas["corner-fluid-flip$it"]
+                },
         )
     val straightFluid =
         SpriteAnimation(
             listOf(transparent) +
-                    (1..8).map {
-                        atlas["straight-fluid$it"]
-                    },
+                (1..8).map {
+                    atlas["straight-fluid$it"]
+                },
         )
 }

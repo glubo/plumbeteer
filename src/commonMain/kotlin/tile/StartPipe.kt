@@ -25,7 +25,7 @@ class StartPipe(
                 return Overflow(
                     elapsed - length,
                     direction,
-                    0L
+                    0L,
                 )
             }
         }
@@ -37,8 +37,8 @@ class StartPipe(
         dt: Duration,
     ) = false
 
-
     override fun isEditable() = false
+
     override fun toString(): String {
         return "StartPipe(direction=$direction, elapsed=$elapsed, liquidDirection=$liquidDirection)"
     }

@@ -4,7 +4,6 @@ import Direction
 import kotlin.time.Duration
 
 class EmptyTile : Tile() {
-
     override fun onUpdate(dt: Duration) = null
 
     override fun takeLiquid(

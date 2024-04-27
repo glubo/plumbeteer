@@ -27,7 +27,7 @@ class CornerPipe(
                 return Overflow(
                     elapsed - length,
                     outputDirection,
-                    1000
+                    1000,
                 )
             }
         }
@@ -50,6 +50,7 @@ class CornerPipe(
     private fun validDirections() = listOf(direction, direction.nextClockwise())
 
     override fun isEditable() = liquidDirection == null
+
     override fun toString(): String {
         return "CornerPipe(direction=$direction, elapsed=$elapsed, liquidDirection=$liquidDirection)"
     }

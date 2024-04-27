@@ -4,27 +4,10 @@ stages:
   - build
   - package
   - helmchart
-  - release
+  - changelog
 
-release:
-  variables:
-    GIT_STRATEGY: clone
-    GIT_DEPTH: "0"
-    NYX_VERBOSITY: INFO
-  #    NYX_CHANGELOG_PATH: CHANGELOG.md
-  image: mooltiverse/nyx:latest
-  only:
-    - main
-  stage: release
-  script:
-    - git config --global user.name "Nyx pipeline"
-    - git config --global user.email nyxrobot@glubo.cz
-    - git checkout -B "$CI_COMMIT_REF_NAME" "$CI_COMMIT_SHA"
-    - nyx publish --git-remotes-origin-password=$NYX_TOKEN --git-remotes-origin-user=PRIVATE-TOKEN
-    - git tag
-    - git log
-    - ls -R
-    - find / -name CHANGELOG.md ||true
+include:
+  - remote: 'https://gitlab.com/g3476/cliffhanger/-/raw/main/gitlab-ci/cliffhanger.yml'
 
 buildTgz:
   only:

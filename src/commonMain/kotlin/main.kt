@@ -34,9 +34,28 @@ suspend fun main() =
     Korge(windowSize = Size(512, 512), backgroundColor = Colors["#2b2b2b"]) {
         val sceneContainer = sceneContainer()
 
+        injector.mapPrototype { MyScene(get()) }
+        injector.mapPrototype { MainMenuScene() }
+        injector.mapSingleton { AssetsLoader() }
         RegisteredImageFormats.register(PNG)
-        sceneContainer.changeTo { MyScene() }
+        sceneContainer.changeTo<MainMenuScene>()
     }
+
+class MainMenuScene : Scene() {
+    override suspend fun SContainer.sceneInit() {
+    }
+
+    override suspend fun SContainer.sceneMain() {
+        text("Pipeteer", textSize = 64, color = Colors.RED) {
+            centerOnStage()
+        }
+        this.mouse {
+            onClick {
+                sceneContainer.changeTo<MyScene>()
+            }
+        }
+    }
+}
 
 class StagingAreaView(
     val stagingArea: StagingArea,
@@ -127,9 +146,29 @@ fun SceneContainer.baseCrossPipe(
     size(tileRect.size)
 }
 
-class MyScene : Scene() {
+class AssetsLoader() {
+    var assets: Assets? = null
+
+    suspend fun get(): Assets {
+        return assets
+            ?: suspend {
+                val atlas =
+                    resourcesVfs["texture3.json"].readAtlas()
+                Assets(atlas)
+            }()
+    }
+}
+
+class MyScene(
+    val assetsLoader: AssetsLoader,
+) : Scene() {
+    lateinit var assets: Assets
+
+    override suspend fun SContainer.sceneInit() {
+        assets = assetsLoader.get()
+    }
+
     override suspend fun SContainer.sceneMain() {
-        val atlas = resourcesVfs["texture3.json"].readAtlas()
         val startDuration = 4.seconds
         var startTimer = startDuration
         var started = false
@@ -138,7 +177,6 @@ class MyScene : Scene() {
         val fieldLayer = sceneContainer()
         val topLayer = sceneContainer()
 
-        val assets = Assets(atlas)
         val staging =
             StagingArea().also {
                 it.replenish()
@@ -222,6 +260,8 @@ class MyScene : Scene() {
             onClick {
                 if (!gameOver) {
                     fieldView.onClick(it)
+                } else {
+                    sceneContainer.changeTo<MainMenuScene>()
                 }
             }
         }

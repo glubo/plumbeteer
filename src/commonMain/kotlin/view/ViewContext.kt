@@ -1,3 +1,6 @@
+package view
+
+import Assets
 import korlibs.korge.view.SContainer
 
 data class ViewContext(

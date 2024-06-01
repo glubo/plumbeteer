@@ -1,3 +1,7 @@
+package view
+
+import Assets
+import PlayField
 import korlibs.korge.input.MouseEvents
 import korlibs.korge.scene.SceneContainer
 import korlibs.korge.view.Sprite
@@ -255,7 +259,7 @@ class PlayFieldView(
             val indexY = (clickPos.y - viewRectangle.y) / tileSize.height
             playField.onTouchUp(indexX.toInt(), indexY.toInt())
         } else {
-            logger.debug { "ignoring click outside PlayFieldView at $clickPos" }
+            logger.debug { "ignoring click outside view.PlayFieldView at $clickPos" }
         }
     }
 }

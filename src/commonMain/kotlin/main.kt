@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 import korlibs.image.atlas.readAtlas
 import korlibs.image.color.Colors
 import korlibs.image.format.PNG
@@ -6,28 +8,23 @@ import korlibs.io.file.std.resourcesVfs
 import korlibs.korge.Korge
 import korlibs.korge.input.mouse
 import korlibs.korge.scene.Scene
-import korlibs.korge.scene.SceneContainer
 import korlibs.korge.scene.sceneContainer
 import korlibs.korge.view.SContainer
 import korlibs.korge.view.View
 import korlibs.korge.view.addUpdater
 import korlibs.korge.view.align.centerOnStage
-import korlibs.korge.view.centered
 import korlibs.korge.view.position
-import korlibs.korge.view.rotation
-import korlibs.korge.view.size
 import korlibs.korge.view.solidRect
-import korlibs.korge.view.sprite
 import korlibs.korge.view.text
+import korlibs.math.geom.Angle
 import korlibs.math.geom.Rectangle
 import korlibs.math.geom.Size
 import korlibs.math.geom.Vector2
-import korlibs.time.TimeSpan
-import tile.CornerPipe
-import tile.CrossPipe
-import tile.EmptyTile
-import tile.StartPipe
-import tile.StraightPipe
+import korlibs.math.random.get
+import view.Particles
+import view.PlayFieldView
+import view.StagingAreaView
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 suspend fun main() =
@@ -57,96 +54,7 @@ class MainMenuScene : Scene() {
     }
 }
 
-class StagingAreaView(
-    val stagingArea: StagingArea,
-    val assets: Assets,
-    val sContainer: SceneContainer,
-    val viewRectangle: Rectangle,
-) {
-    val views = mutableListOf<View>()
-    val tileSize =
-        Size(
-            viewRectangle.width,
-            viewRectangle.height / stagingArea.count,
-        )
-
-    fun update(dt: TimeSpan) {
-        views.forEach { it.removeFromParent() }
-        views.clear()
-
-        stagingArea.fifo.forEachIndexed { y, tile ->
-            val tilePos =
-                Vector2(
-                    viewRectangle.x,
-                    viewRectangle.y + y * tileSize.height,
-                )
-            val tileRect =
-                Rectangle(
-                    tilePos.x,
-                    tilePos.y,
-                    tileSize.width,
-                    tileSize.height,
-                )
-
-            views.add(
-                sContainer.sprite(assets.empty) {
-                    position(tilePos.x, tilePos.y)
-                    size(tileSize)
-                },
-            )
-
-            when (tile) {
-                is EmptyTile -> null
-                is CornerPipe -> sContainer.baseCornerPipe(assets, tileRect, tile)
-                is CrossPipe -> sContainer.baseCrossPipe(assets, tileRect, tile)
-                is StartPipe -> null
-                is StraightPipe -> sContainer.baseStraigthPipe(assets, tileRect, tile)
-            }?.let {
-                views.add(it)
-            }
-        }
-    }
-}
-
-fun SceneContainer.baseCornerPipe(
-    assets: Assets,
-    tileRect: Rectangle,
-    tile: CornerPipe,
-) = this.sprite(
-    assets.corner,
-) {
-    position(tileRect.centerX, tileRect.centerY)
-    centered
-    size(tileRect.size)
-    rotation(tile.direction.angle())
-}
-
-fun SceneContainer.baseStraigthPipe(
-    assets: Assets,
-    tileRect: Rectangle,
-    tile: StraightPipe,
-) = this.sprite(
-    assets.straightV,
-) {
-    position(tileRect.centerX, tileRect.centerY)
-    centered
-    size(tileRect.size)
-    rotation(tile.orientation.directions.first().angle())
-}
-
-fun SceneContainer.baseCrossPipe(
-    assets: Assets,
-    tileRect: Rectangle,
-    tile: CrossPipe,
-) = this.sprite(
-    assets.cross,
-) {
-    position(tileRect.centerX, tileRect.centerY)
-    centered
-    size(tileRect.size)
-}
-
-class AssetsLoader() {
+class AssetsLoader {
     var assets: Assets? = null
 
     suspend fun get(): Assets {
@@ -174,38 +82,81 @@ class MyScene(
         var started = false
         var gameOver = false
 
+        val tileWidth = 40
+        val tileHeight = 40
+        val fieldCountX = 10
+        val fieldCountY = 10
+
         val fieldLayer = sceneContainer()
+        val particleLayer = sceneContainer()
         val topLayer = sceneContainer()
 
         val staging =
             StagingArea().also {
                 it.replenish()
             }
+        val viewRectangle =
+            Rectangle(
+                0,
+                0,
+                tileWidth * fieldCountX,
+                tileHeight * fieldCountY,
+            )
+        val particles =
+            Particles(
+                assets,
+                particleLayer,
+                viewRectangle,
+            )
         val field =
             PlayField(
-                xtiles = 10,
-                ytiles = 10,
+                xtiles = fieldCountX,
+                ytiles = fieldCountY,
                 staging,
-            ) { println("unhandled $it") }
+            ) {
+                when (it) {
+                    is Scored -> {
+                        particles.addParticle(
+                            Particles.Particle(
+                                Vector2(
+                                    it.x * tileWidth,
+                                    it.y * tileHeight,
+                                ),
+                                Vector2(
+                                    Random.get(-40.0, 40.0),
+                                    Random.get(-30.0, 10.0),
+                                ),
+                                Vector2(
+                                    0,
+                                    98.0,
+                                ),
+                                Angle.ZERO,
+                                Angle.ZERO,
+                                particleLayer.text(it.score.toString()),
+                                2.seconds,
+                            ),
+                        )
+                    }
+
+                    else -> {
+                        println("unhandled $it")
+                    }
+                }
+            }
 
         val stagingView =
             StagingAreaView(
                 staging,
                 assets,
                 fieldLayer,
-                Rectangle(450, 0, 40, 200),
+                Rectangle(450, 0, tileWidth, 5 * tileHeight),
             )
         val fieldView =
             PlayFieldView(
                 field,
                 assets,
                 fieldLayer,
-                Rectangle(
-                    0,
-                    0,
-                    400,
-                    400,
-                ),
+                viewRectangle,
             )
 
         val scoreView =
@@ -230,6 +181,7 @@ class MyScene(
             }
             fieldView.update(dt)
             stagingView.update(dt)
+            particles.update(dt)
             scoreView.text = "SCORE: ${field.score}"
             if (!started && startTimer == 0.seconds) {
                 started = true

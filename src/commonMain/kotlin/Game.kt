@@ -12,10 +12,10 @@ sealed interface FieldEvent
 
 class GameOver : FieldEvent
 
-class Scored(
-    x: Int,
-    y: Int,
-    score: Long,
+data class Scored(
+    val x: Int,
+    val y: Int,
+    val score: Long,
 ) : FieldEvent
 
 class Placed(

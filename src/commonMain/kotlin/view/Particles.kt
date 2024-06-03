@@ -41,8 +41,8 @@ class Particles(
 
             it.lifetime -= dt
 
-            it.view.x = it.position.x.toDouble()
-            it.view.y = it.position.y.toDouble()
+            it.view.x = it.position.x.toDouble() - it.view.width * 0.5
+            it.view.y = it.position.y.toDouble() - it.view.height * 0.5
             it.view.rotation = it.angle
 
             if (it.lifetime <= 0.seconds) toRemove.add(it)

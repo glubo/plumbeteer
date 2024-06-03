@@ -116,12 +116,14 @@ class MyScene(
             ) {
                 when (it) {
                     is Scored -> {
+                        val position =
+                            Vector2(
+                                it.x * tileWidth + tileWidth * 0.5,
+                                it.y * tileHeight + tileHeight * 0.5,
+                            )
                         particles.addParticle(
                             Particles.Particle(
-                                Vector2(
-                                    it.x * tileWidth,
-                                    it.y * tileHeight,
-                                ),
+                                position,
                                 Vector2(
                                     Random.get(-40.0, 40.0),
                                     Random.get(-30.0, 10.0),
@@ -136,6 +138,28 @@ class MyScene(
                                 2.seconds,
                             ),
                         )
+                        (1..50).forEach { _ ->
+
+                            particles.addParticle(
+                                Particles.Particle(
+                                    position,
+                                    Vector2(
+                                        Random.get(-40.0, 40.0),
+                                        Random.get(-30.0, 10.0),
+                                    ),
+                                    Vector2(
+                                        0,
+                                        98.0,
+                                    ),
+                                    Angle.ZERO,
+                                    Angle.ZERO,
+                                    particleLayer.solidRect(
+                                        Size(1, 1),
+                                    ),
+                                    2.seconds,
+                                ),
+                            )
+                        }
                     }
 
                     else -> {

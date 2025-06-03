@@ -31,6 +31,15 @@ platform :ios do
       path: "./app.xcodeproj",
       team_id: "4DT3H2ZT3G",
       profile_name: "match AppStore cz.glubo.plumbeteer",
+      targets: [
+            "app-Arm64-Debug",
+            "app-Arm64-Release",
+            "app-SimulatorArm64-Debug",
+            "app-SimulatorArm64-Release",
+            "app-X64-Debug",
+            "app-X64-Release"
+      ],
+      code_sign_identity: "Apple Distribution"
     )
 
     increment_build_number(

@@ -48,6 +48,7 @@ buildHelm:
   only:
     - tags
   stage: helmchart
+  needs: [buildDocker]
   image: alpine/helm
   script:
     - helm plugin install https://github.com/chartmuseum/helm-push

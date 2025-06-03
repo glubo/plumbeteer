@@ -1,4 +1,4 @@
-image: eclipse-temurin:17
+image: eclipse-temurin:21
 
 stages:
   - build
@@ -67,6 +67,10 @@ buildIos:
   variables:
     TARGET_IOS: true
   script:
+    - ./gradlew --version
+    - asdf list
+    - asdf install java temurin-21.0.2+13
+    - asdf local java temurin-21.0.2+13
     - ./gradlew --version
     - asdf list
     - ./gradlew packageIosDeviceRelease

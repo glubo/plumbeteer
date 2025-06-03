@@ -78,6 +78,6 @@ buildIos:
     - cd build/platforms/ios/
     - gem install fastlane --no-document
     - fastlane beta
-  #cache:
-    #- paths:
-      #- build
+  cache:
+    - paths:
+      - build

@@ -10,6 +10,7 @@ platform :ios do
   end
 
   lane :beta do
+    setup_ci
     # sh("xcodebuild -resolvePackageDependencies -project ../app.xcodeproj -scheme app-Arm64-Release")
     match(
       type: "appstore",

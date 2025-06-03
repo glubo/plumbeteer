@@ -69,14 +69,11 @@ buildIos:
   variables:
     TARGET_IOS: true
   script:
-    - asdf list all java
     - asdf install java openjdk-21
     - asdf local java openjdk-21
-    - ./gradlew --version
-    - asdf list
     #- ./gradlew packageIosDeviceRelease
     - ./gradlew linkReleaseFrameworkIosArm64
-    - ls --tree build/platforms/ios
+    - ls -R build/platforms/ios
     - cp -r ios.template/* build/platforms/ios/
     - cd build/platforms/ios/
     - gem install fastlane --no-document

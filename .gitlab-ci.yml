@@ -67,6 +67,8 @@ buildIos:
   variables:
     TARGET_IOS: true
   script:
+    - ./gradlew --version
+    - asdf list
     - ./gradlew packageIosDeviceRelease
     - ls --tree build/platforms/ios
     - cp -r ios.template/* build/platforms/ios/

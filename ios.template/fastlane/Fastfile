@@ -1,0 +1,59 @@
+default_platform(:ios)
+
+platform :ios do
+ lane :version_from_git do
+    tag = `git describe --tags --abbrev=0`.strip
+    version = tag.sub(/^v/, "")
+
+    UI.message("Setting CFBundleShortVersionString to #{version}")
+    increment_version_number(version_number: version)
+  end
+
+  lane :beta do
+    # sh("xcodebuild -resolvePackageDependencies -project ../app.xcodeproj -scheme app-Arm64-Release")
+    match(
+      type: "appstore",
+      readonly: true,
+      app_identifier: "cz.glubo.plumbeteer",
+      private_token: ENV["NYX_TOKEN"]
+    )
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APPSTORE_KEY_ID"],
+      issuer_id: ENV["APPSTORE_ISSUER_ID"],
+      key_content: ENV["APPSTORE_API_KEY"],
+      is_key_content_base64: true,
+      in_house: false
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "./app.xcodeproj",
+      team_id: "4DT3H2ZT3G",
+      profile_name: "match AppStore cz.glubo.plumbeteer",
+    )
+
+    increment_build_number(
+      xcodeproj: "./app.xcodeproj",
+      build_number: Time.now.strftime("%Y%m%d%H%M")
+    )
+    version_from_git
+    
+    recreate_schemes(project: "./app.xcodeproj")
+    sh("mkdir -p ../app.xcodeproj/xcshareddata/xcschemes")
+    sh("cp ../app.xcodeproj/xcuserdata/*.xcuserdatad/xcschemes/app-Arm64-Release.xcscheme ../app.xcodeproj/xcshareddata/xcschemes/")
+
+    build_app(
+      scheme: "app-Arm64-Release",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "cz.glubo.plumbeteer" => "match AppStore cz.glubo.plumbeteer"
+        },
+      },
+      xcargs: "PRODUCT_BUNDLE_IDENTIFIER=cz.glubo.plumbeteer"
+      #export_xcargs: "-allowProvisioningUpdates"
+    )
+
+    upload_to_testflight(api_key: api_key)
+  end
+end

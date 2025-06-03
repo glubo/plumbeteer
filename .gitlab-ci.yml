@@ -5,6 +5,7 @@ stages:
   - package
   - helmchart
   - changelog
+  - buildIos
 
 include:
   - remote: 'https://gitlab.com/g3476/cliffhanger/-/raw/main/gitlab-ci/cliffhanger.yml'
@@ -60,7 +61,7 @@ buildIos:
   tags:
     - saas-macos-medium-m1
   image: macos-15-xcode-16
-  stage: build
+  stage: buildIos
   rules:
     - if: '$CI_COMMIT_TAG'
       when: manual

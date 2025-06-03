@@ -10,6 +10,8 @@ include:
   - remote: 'https://gitlab.com/g3476/cliffhanger/-/raw/main/gitlab-ci/cliffhanger.yml'
 
 buildTgz:
+  tags:
+    - glubo
   only:
     - tags
   stage: build
@@ -24,6 +26,8 @@ buildTgz:
     expire_in: 1 days
 
 buildDocker:
+  tags:
+    - glubo
   only:
     - tags
   stage: package
@@ -37,6 +41,8 @@ buildDocker:
       --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
 
 buildHelm:
+  tags:
+    - glubo
   only:
     - tags
   stage: helmchart

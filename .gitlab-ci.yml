@@ -67,10 +67,9 @@ buildIos:
   variables:
     TARGET_IOS: true
   script:
-    - ./gradlew --version
-    - asdf list
-    - asdf install java temurin-21.0.2+13
-    - asdf local java temurin-21.0.2+13
+    - asdf list all java
+    - asdf install java openjdk-21
+    - asdf local java openjdk-21
     - ./gradlew --version
     - asdf list
     - ./gradlew packageIosDeviceRelease

@@ -18,6 +18,7 @@ buildTgz:
   variables:
     TARGET_JS: true
   script:
+    - ./gradlew kotlinUpgradeYarnLock
     - ./gradlew jsBrowserDistribution
     - tar -czf plumbeteer.tgz -C build/dist/js/productionExecutable/ .
   artifacts:

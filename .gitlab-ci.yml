@@ -72,7 +72,8 @@ buildIos:
     - asdf local java openjdk-21
     - ./gradlew --version
     - asdf list
-    - ./gradlew packageIosDeviceRelease
+    #- ./gradlew packageIosDeviceRelease
+    - ./gradlew linkReleaseFrameworkIosArm64
     - ls --tree build/platforms/ios
     - cp -r ios.template/* build/platforms/ios/
     - cd build/platforms/ios/

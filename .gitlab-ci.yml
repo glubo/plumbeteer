@@ -67,6 +67,6 @@ buildIos:
     - gem install fastlane --no-document
     - fastlane beta
   cache:
-    paths:
-      - plumbeteer.tgz
-    expire_in: 1 days
+    - paths:
+      - build
+      expire_in: 1 days

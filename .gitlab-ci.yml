@@ -13,6 +13,8 @@ buildTgz:
   only:
     - tags
   stage: build
+  variables:
+    TARGET_JS: true
   script:
     - ./gradlew jsBrowserDistribution
     - tar -czf plumbeteer.tgz -C build/dist/js/productionExecutable/ .
@@ -46,3 +48,25 @@ buildHelm:
     - helm repo add --username PRIVATE-TOKEN --password "${NYX_TOKEN}" gitlab "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/main"
     - helm repo list
     - helm cm-push "plumbeteer-${CI_COMMIT_REF_NAME}.tgz" gitlab
+
+buildIos:
+  tags:
+    - saas-macos-medium-m1
+  image: macos-15-xcode-16
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: manual
+    - when: never
+  variables:
+    TARGET_IOS: true
+  script:
+    - ./gradlew packageIosDeviceRelease
+    - ls --tree build/platforms/ios
+    - cp -r ios.template/* build/platforms/ios/
+    - cd build/platforms/ios/
+    - gem install fastlane --no-document
+    - fastlane beta
+  cache:
+    paths:
+      - plumbeteer.tgz
+    expire_in: 1 days

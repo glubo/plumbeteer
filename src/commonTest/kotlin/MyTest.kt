@@ -4,6 +4,7 @@ import korlibs.korge.tests.ViewsForTesting
 import korlibs.korge.tween.get
 import korlibs.korge.tween.tween
 import korlibs.korge.view.solidRect
+import korlibs.math.geom.Rectangle
 import korlibs.time.seconds
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -9,13 +9,18 @@ import korlibs.korge.Korge
 import korlibs.korge.input.mouse
 import korlibs.korge.scene.Scene
 import korlibs.korge.scene.sceneContainer
+import korlibs.korge.ui.uiButton
+import korlibs.korge.ui.uiVerticalFill
+import korlibs.korge.ui.uiVerticalStack
 import korlibs.korge.view.SContainer
 import korlibs.korge.view.View
 import korlibs.korge.view.addUpdater
 import korlibs.korge.view.align.centerOnStage
+import korlibs.korge.view.align.centerXOn
 import korlibs.korge.view.position
 import korlibs.korge.view.solidRect
 import korlibs.korge.view.text
+import korlibs.korge.view.visible
 import korlibs.math.geom.Angle
 import korlibs.math.geom.Rectangle
 import korlibs.math.geom.Size
@@ -31,7 +36,7 @@ suspend fun main() =
     Korge(windowSize = Size(512, 512), backgroundColor = Colors["#2b2b2b"]) {
         val sceneContainer = sceneContainer()
 
-        injector.mapPrototype { MyScene(get()) }
+        injector.mapPrototype { GameScene(get()) }
         injector.mapPrototype { MainMenuScene() }
         injector.mapSingleton { AssetsLoader() }
         RegisteredImageFormats.register(PNG)
@@ -43,13 +48,35 @@ class MainMenuScene : Scene() {
     }
 
     override suspend fun SContainer.sceneMain() {
-        text("Pipeteer", textSize = 64, color = Colors.RED) {
-            centerOnStage()
-        }
-        this.mouse {
-            onClick {
-                sceneContainer.changeTo<MyScene>()
+        uiVerticalStack(padding = 10.0) {
+            text("Pipeteer", textSize = 64, color = Colors.RED) { }
+            uiVerticalFill {  }
+            uiButton("New Game") {
+                centerXOn(this@uiVerticalStack)
+                mouse {
+                    onClick {
+                        sceneContainer.changeTo<GameScene>()
+                    }
+                }
             }
+            val quit = uiButton("Quit") {
+                centerXOn(this@uiVerticalStack)
+            }
+            val really = uiButton("Really Quit") {
+                visible = false
+                centerXOn(this@uiVerticalStack)
+                mouse {
+                    onClick {
+                        views.gameWindow.close()
+                    }
+                }
+            }
+            quit.mouse {
+                onClick {
+                    really.visible(true)
+                }
+            }
+            centerOnStage()
         }
     }
 }
@@ -67,7 +94,7 @@ class AssetsLoader {
     }
 }
 
-class MyScene(
+class GameScene(
     val assetsLoader: AssetsLoader,
 ) : Scene() {
     lateinit var assets: Assets

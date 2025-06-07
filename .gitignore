@@ -13,4 +13,6 @@ korge.keystore
 local.properties
 src/main/*
 .DS_Store
-
+.tool-versions
+.kotlin
+korge-hello-world-debug

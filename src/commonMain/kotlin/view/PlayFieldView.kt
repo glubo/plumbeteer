@@ -78,14 +78,13 @@ class PlayFieldView(
                         position(tilePos.x, tilePos.y)
                         size(tileSize)
                         if (hover) {
-                            val ratio = 0.5 * abs(sin( durationFromStart.milliseconds *0.002))
-                            logger.info { ratio }
+                            val ratio = 0.5 * abs(sin(durationFromStart.milliseconds * 0.002))
                             addFilter(
                                 ColorTransformFilter(
                                     ColorTransform(
-                                        multiply = RED.interpolateWith(Ratio(ratio), WHITE)
-                                    )
-                                )
+                                        multiply = RED.interpolateWith(Ratio(ratio), WHITE),
+                                    ),
+                                ),
                             )
                         }
                     },
@@ -159,7 +158,11 @@ class PlayFieldView(
                 position(tileRect.centerX, tileRect.centerY)
                 centered
                 size(tileSize)
-                rotation(tile.orientation.directions.first().angle())
+                rotation(
+                    tile.orientation.directions
+                        .first()
+                        .angle(),
+                )
             },
         )
 

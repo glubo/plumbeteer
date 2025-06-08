@@ -10,7 +10,15 @@ import kotlin.time.Duration.Companion.seconds
 
 sealed interface FieldEvent
 
-class GameOver : FieldEvent
+sealed interface FieldFinalEvent : FieldEvent
+
+data class GameOver(
+    val score: Long,
+) : FieldFinalEvent
+
+data class NextLevel(
+    val score: Long,
+) : FieldFinalEvent
 
 data class Scored(
     val x: Int,
@@ -60,17 +68,20 @@ class PlayField(
     val xtiles: Int,
     val ytiles: Int,
     val stagingArea: StagingArea,
+    val currentLevel: Level,
+    var score: Long = 0L,
     private val eventCallback: (FieldEvent) -> Unit,
 ) {
     val tiles =
         (1..xtiles).map { _ ->
-            (1..ytiles).map { _ ->
-                EmptyTile()
-            }.toMutableList<Tile>()
+            (1..ytiles)
+                .map { _ ->
+                    EmptyTile()
+                }.toMutableList<Tile>()
         }
     val startX = (1..<xtiles - 1).random()
     val startY = (1..<ytiles - 1).random()
-    var score = 0L
+    var distance = currentLevel.targetDistance
 
     init {
         tiles[startX][startY] = StartPipe(2.seconds, Direction.entries.random())
@@ -80,8 +91,8 @@ class PlayField(
         (tiles[startX][startY] as StartPipe).start()
     }
 
-    fun onUpdate(dt: Duration): GameOver? {
-        var result: GameOver? = null
+    fun onUpdate(dt: Duration): FieldFinalEvent? {
+        var result: FieldFinalEvent? = null
         tiles.forEachIndexed { x, slice ->
             slice.forEachIndexed { y, tile ->
                 val event =
@@ -92,14 +103,15 @@ class PlayField(
                 when (event) {
                     is Overflow -> {
                         score += event.score
+                        distance--
                         eventCallback(Scored(x, y, event.score))
                         val pos = event.direction.vec + Vec2i(x, y)
                         val newTile = getTileOrNull(pos)
                         if (newTile == null) {
-                            result = GameOver()
+                            result = overOrNextLevel()
                         } else {
                             if (!newTile.takeLiquid(event.direction, event.dt)) {
-                                result = GameOver()
+                                result = overOrNextLevel()
                             }
                         }
                     }
@@ -113,8 +125,15 @@ class PlayField(
         }
     }
 
+    private fun overOrNextLevel() =
+        when {
+            distance <= 0 -> NextLevel(score)
+            else -> GameOver(score)
+        }
+
     private fun getTileOrNull(vec: Vec2i) =
-        tiles.getOrNull(vec.x)
+        tiles
+            .getOrNull(vec.x)
             ?.getOrNull(vec.y)
 
     fun onTouchUp(

@@ -85,7 +85,7 @@ class AssetsLoader {
         assets
             ?: suspend {
                 val atlas =
-                    resourcesVfs["texture3.json"].readAtlas()
+                    resourcesVfs["texture4.json"].readAtlas()
                 Assets(atlas)
             }()
 }

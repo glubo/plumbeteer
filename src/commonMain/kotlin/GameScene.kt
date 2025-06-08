@@ -165,6 +165,10 @@ class GameScene(
             text("DISTANCE: 0", textSize = 24) {
                 position(210, 410)
             }
+        val levelView =
+            text("LEVEL: ${state.currentLevel.name}", textSize = 24) {
+                position(10, 430)
+            }
         var gameFinalizedView: View? = null
         val startTimerView =
             topLayer.solidRect(
@@ -230,15 +234,15 @@ class GameScene(
 
                     NEXT_LEVEL -> {
                         gameFinalizedView =
-                            topLayer.text("CONGRATZ, YOU MADE IT TO NEXT LEVEL", textSize = 68, color = Colors.BLACK) {
+                            topLayer.text("YOU MADE IT", textSize = 68, color = Colors.BLACK) {
                                 centerOnStage()
                             }
                         gameFinalizedView =
-                            topLayer.text("CONGRATZ, YOU MADE IT TO NEXT LEVEL", textSize = 66, color = Colors.WHITE) {
+                            topLayer.text("YOU MADE IT", textSize = 66, color = Colors.WHITE) {
                                 centerOnStage()
                             }
                         gameFinalizedView =
-                            topLayer.text("CONGRATZ, YOU MADE IT TO NEXT LEVEL", textSize = 64, color = Colors.RED) {
+                            topLayer.text("YOU MADE IT", textSize = 64, color = Colors.GREEN) {
                                 centerOnStage()
                             }
                     }

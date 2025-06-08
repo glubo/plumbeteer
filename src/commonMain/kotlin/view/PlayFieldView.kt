@@ -71,7 +71,7 @@ class PlayFieldView(
                         tileSize.width,
                         tileSize.height,
                     )
-                val hover = tileRect.contains(currentMousePos) && isActiveCallback()
+                val hover = !views.input.isTouchDevice && isActiveCallback() && tileRect.contains(currentMousePos)
 
                 currentViews.add(
                     sContainer.sprite(assets.empty) {

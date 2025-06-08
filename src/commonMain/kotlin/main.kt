@@ -50,7 +50,7 @@ class MainMenuScene : Scene() {
     override suspend fun SContainer.sceneMain() {
         uiVerticalStack(padding = 10.0) {
             text("Pipeteer", textSize = 64, color = Colors.RED) { }
-            uiVerticalFill {  }
+            uiVerticalFill { }
             uiButton("New Game") {
                 centerXOn(this@uiVerticalStack)
                 mouse {
@@ -93,6 +93,30 @@ class AssetsLoader {
             }()
     }
 }
+
+data class Level(
+    val name: String,
+    val targetDistance: Int,
+    val timerS: Int,
+)
+
+val levels = listOf(
+    Level(
+        "1 First Steps",
+        14,
+        17,
+    ),
+    Level(
+        "2 Faster and Longer",
+        15,
+        15,
+    ),
+    Level(
+        "3 Fasterer and Longerer",
+        16,
+        13,
+    ),
+)
 
 class GameScene(
     val assetsLoader: AssetsLoader,
@@ -208,6 +232,8 @@ class GameScene(
                 assets,
                 fieldLayer,
                 viewRectangle,
+                views,
+                isActiveCallback = { !gameOver }
             )
 
         val scoreView =

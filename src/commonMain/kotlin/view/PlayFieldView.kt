@@ -2,11 +2,17 @@ package view
 
 import Assets
 import PlayField
+import korlibs.image.color.ColorTransform
+import korlibs.image.color.Colors.RED
+import korlibs.image.color.Colors.WHITE
 import korlibs.korge.input.MouseEvents
 import korlibs.korge.scene.SceneContainer
 import korlibs.korge.view.Sprite
 import korlibs.korge.view.View
+import korlibs.korge.view.Views
 import korlibs.korge.view.centered
+import korlibs.korge.view.filter.ColorTransformFilter
+import korlibs.korge.view.filter.addFilter
 import korlibs.korge.view.position
 import korlibs.korge.view.rotation
 import korlibs.korge.view.size
@@ -16,12 +22,16 @@ import korlibs.math.geom.Angle
 import korlibs.math.geom.Rectangle
 import korlibs.math.geom.Size
 import korlibs.math.geom.Vector2
-import korlibs.time.TimeSpan
+import korlibs.math.interpolation.Ratio
+import korlibs.time.fast
+import korlibs.time.seconds
 import tile.CornerPipe
 import tile.CrossPipe
 import tile.EmptyTile
 import tile.StartPipe
 import tile.StraightPipe
+import kotlin.math.abs
+import kotlin.math.sin
 import kotlin.time.Duration
 
 class PlayFieldView(
@@ -29,18 +39,23 @@ class PlayFieldView(
     val assets: Assets,
     val sContainer: SceneContainer,
     val viewRectangle: Rectangle,
+    val views: Views,
+    val isActiveCallback: () -> Boolean,
 ) {
+    var durationFromStart = 0.seconds.fast
     val logger = Logger(this::class.simpleName!!)
-    val views = mutableListOf<View>()
+    val currentViews = mutableListOf<View>()
     val tileSize =
         Size(
             viewRectangle.width / playField.xtiles,
             viewRectangle.height / playField.ytiles,
         )
 
-    fun update(dt: TimeSpan) {
-        views.forEach { it.removeFromParent() }
-        views.clear()
+    fun update(dt: Duration) {
+        durationFromStart += dt.fast
+        currentViews.forEach { it.removeFromParent() }
+        currentViews.clear()
+        val currentMousePos = sContainer.localMousePos(views)
 
         playField.tiles.forEachIndexed { x, row ->
             row.forEachIndexed { y, tile ->
@@ -56,11 +71,23 @@ class PlayFieldView(
                         tileSize.width,
                         tileSize.height,
                     )
+                val hover = tileRect.contains(currentMousePos) && isActiveCallback()
 
-                views.add(
+                currentViews.add(
                     sContainer.sprite(assets.empty) {
                         position(tilePos.x, tilePos.y)
                         size(tileSize)
+                        if (hover) {
+                            val ratio = 0.5 * abs(sin( durationFromStart.milliseconds *0.002))
+                            logger.info { ratio }
+                            addFilter(
+                                ColorTransformFilter(
+                                    ColorTransform(
+                                        multiply = RED.interpolateWith(Ratio(ratio), WHITE)
+                                    )
+                                )
+                            )
+                        }
                     },
                 )
                 when (tile) {
@@ -72,6 +99,7 @@ class PlayFieldView(
                     is CrossPipe -> {
                         crossPipe(tile, tileRect)
                     }
+
                     is StartPipe -> {
                         startPipe(tile, tileRect)
                     }
@@ -88,7 +116,7 @@ class PlayFieldView(
         tile: CrossPipe,
         tileRect: Rectangle,
     ) {
-        views.add(
+        currentViews.add(
             sContainer.sprite(
                 assets.cross,
             ) {
@@ -114,7 +142,7 @@ class PlayFieldView(
                         innerTile.length,
                     )
                 }
-            views.add(
+            currentViews.add(
                 liquidView,
             )
         }
@@ -124,7 +152,7 @@ class PlayFieldView(
         tile: StraightPipe,
         tileRect: Rectangle,
     ) {
-        views.add(
+        currentViews.add(
             sContainer.sprite(
                 assets.straightV,
             ) {
@@ -149,7 +177,7 @@ class PlayFieldView(
                     tile.length,
                 )
             }
-        views.add(
+        currentViews.add(
             liquidView,
         )
     }
@@ -158,7 +186,7 @@ class PlayFieldView(
         tile: StartPipe,
         tileRect: Rectangle,
     ) {
-        views.add(
+        currentViews.add(
             sContainer.sprite(
                 assets.start,
             ) {
@@ -183,7 +211,7 @@ class PlayFieldView(
                     tile.length,
                 )
             }
-        views.add(
+        currentViews.add(
             liquidView,
         )
     }
@@ -206,7 +234,7 @@ class PlayFieldView(
         tile: CornerPipe,
         tileRect: Rectangle,
     ) {
-        views.add(
+        currentViews.add(
             sContainer.sprite(
                 assets.corner,
             ) {
@@ -247,7 +275,7 @@ class PlayFieldView(
                     )
                 }
             }
-        views.add(
+        currentViews.add(
             liquidView,
         )
     }
